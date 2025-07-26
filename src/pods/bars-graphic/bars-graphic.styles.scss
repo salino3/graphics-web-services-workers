@@ -8,3 +8,52 @@
   width: 100%;
   flex-grow: 1;
 }
+
+.AppContainer {
+  text-align: center;
+  padding: 20px;
+
+  .App-header {
+    background-color: #282c34;
+    padding: 20px;
+    color: white;
+    margin-bottom: 30px;
+    border-radius: 8px;
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-size: 1.1rem;
+      background-color: #61dafb;
+      color: #282c34;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+
+      &:hover:not(:disabled) {
+        background-color: #21a1f1;
+      }
+
+      &:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+    }
+  }
+
+  .App-main {
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    .error-message {
+      color: red;
+      font-weight: bold;
+    }
+  }
+}
