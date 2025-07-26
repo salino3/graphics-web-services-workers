@@ -56,12 +56,14 @@ export const BarsGraphic: React.FC = () => {
     setChartData(null);
     setOriginalRecordCount(0);
 
+    const jsonPath = import.meta.env.BASE_URL + "data.json";
+
     if (workerRef.current) {
       // Send a message to the worker to start processing
       // The path is relative to the public folder
       workerRef.current.postMessage({
         type: "loadData",
-        payload: "/data.json",
+        payload: jsonPath,
       });
     }
   };
