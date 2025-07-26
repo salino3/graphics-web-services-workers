@@ -4,37 +4,4 @@
   justify-content: flex-start;
   align-items: center;
   height: 100%;
-
-  .containerHomePage {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 1.5rem;
-    padding-bottom: 2.5rem;
-
-    .boxButtonHome {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      gap: 1rem;
-
-      & > div {
-        border: solid transparent;
-        border-radius: 0.5rem;
-      }
-
-      .btnRegister,
-      .btnLogin {
-        border: inset var(--global-01);
-      }
-    }
-
-    h4 {
-      padding: 0;
-      margin: 0;
-      border-bottom: solid 1px;
-    }
-  }
 }
