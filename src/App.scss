@@ -1,7 +1,10 @@
 .btnPrimary_01 {
-  button {
+  button,
+  a {
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), -1px -1px 8px rgba(0, 0, 0, 0.3);
+
     &:active {
-      // background-color: rgba(255, 255, 255, 0.4);
       opacity: 0.4;
     }
 
