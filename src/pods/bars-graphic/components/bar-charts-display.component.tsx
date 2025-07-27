@@ -24,26 +24,35 @@ interface BarChartDisplayProps {
   labels: string[];
   values: number[];
   title: string;
-  dataType: "population" | "pets"; // New prop to indicate data type
+  dataType: "population" | "pets" | "petsPercentage"; // Updated prop type
 }
 
 export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
   labels,
   values,
   title,
-  dataType, // Destructure the new dataType prop
+  dataType,
 }) => {
   // Determine dataset label and Y-axis title based on dataType
   const datasetLabel =
-    dataType === "population" ? "Total Population (Persons)" : "Total Pets";
+    dataType === "population"
+      ? "Total Population (Persons)"
+      : dataType === "pets"
+      ? "Total Pets"
+      : "Percentage of Total Pets"; // New label for percentage
+
   const yAxisTitle =
-    dataType === "population" ? "Number of Persons" : "Number of Pets";
+    dataType === "population"
+      ? "Number of Persons"
+      : dataType === "pets"
+      ? "Number of Pets"
+      : "Percentage (%)"; // New Y-axis title for percentage
 
   const data = {
-    labels: labels, // These are now the country names
+    labels: labels,
     datasets: [
       {
-        label: datasetLabel, // Dynamic label for the dataset
+        label: datasetLabel,
         data: values,
         backgroundColor: "rgba(75, 192, 192, 0.6)",
         borderColor: "rgba(75, 192, 192, 1)",
@@ -60,12 +69,11 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
       },
       title: {
         display: true,
-        text: title, // Use the title passed from the parent component
+        text: title,
       },
       tooltip: {
         callbacks: {
           title: function (context: any) {
-            // Tooltip title will be the country name
             return `Country: ${context[0].label}`;
           },
           label: function (context: any) {
@@ -78,8 +86,14 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
               label += new Intl.NumberFormat("en-US", {
                 style: "decimal",
               }).format(context.parsed.y);
-              // Dynamic suffix for the value (persons or pets)
-              label += dataType === "population" ? " persons" : " pets";
+              // Dynamic suffix for the value (persons, pets, or %)
+              if (dataType === "population") {
+                label += " persons";
+              } else if (dataType === "pets") {
+                label += " pets";
+              } else if (dataType === "petsPercentage") {
+                label += "%"; // Add percentage sign
+              }
             }
             return label;
           },
@@ -91,15 +105,27 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
       x: {
         title: {
           display: true,
-          text: "Country", // X-axis title is always "Country"
+          text: "Country",
         },
       },
       y: {
         title: {
           display: true,
-          text: yAxisTitle, // Dynamic Y-axis title based on dataType
+          text: yAxisTitle, // Dynamic Y-axis title
         },
         beginAtZero: true,
+        // For percentage chart, ensure Y-axis goes up to 100%
+        max: dataType === "petsPercentage" ? 100 : undefined,
+        ticks: {
+          callback: function (value: any) {
+            // Add '%' suffix to Y-axis ticks if it's a percentage chart
+            return dataType === "petsPercentage"
+              ? value + "%"
+              : new Intl.NumberFormat("en-US", { style: "decimal" }).format(
+                  value
+                );
+          },
+        },
       },
     },
   };

@@ -3,7 +3,7 @@ import { BarChartDisplay } from "./components/bar-charts-display.component";
 import "./bars-graphic.styles.scss";
 
 // Define the types of data that can be displayed
-type ChartDataType = "population" | "pets";
+type ChartDataType = "" | "population" | "pets" | "petsPercentage"; // Added 'petsPercentage'
 
 export const BarsGraphic: React.FC = () => {
   const [chartData, setChartData] = useState<{
@@ -15,7 +15,7 @@ export const BarsGraphic: React.FC = () => {
   const [originalRecordCount, setOriginalRecordCount] = useState<number>(0);
   // New state to control which data type is currently displayed
   const [currentChartDataType, setCurrentChartDataType] =
-    useState<ChartDataType>("population");
+    useState<ChartDataType>("");
 
   // Use useRef to store the worker instance so it doesn't get re-created on re-renders
   const workerRef = useRef<Worker | null>(null);
@@ -28,12 +28,10 @@ export const BarsGraphic: React.FC = () => {
     setOriginalRecordCount(0);
     setCurrentChartDataType(dataType); // Update the current data type state
 
-    // Use the NEW JSON file name for raw persons data
+    // Use the JSON file name for raw persons data
     const jsonPath = import.meta.env.BASE_URL + "persons_data.json";
 
     if (workerRef.current) {
-      // Send a message to the worker to start processing
-      // Now, we also send the dataType so the worker knows what to aggregate
       workerRef.current.postMessage({
         type: "loadData",
         payload: jsonPath,
@@ -69,9 +67,6 @@ export const BarsGraphic: React.FC = () => {
       console.error("Worker error:", e);
     };
 
-    // Initial data load when component mounts (e.g., default to population)
-    loadDataWithWorker("population");
-
     // Clean up the worker when the component unmounts
     return () => {
       if (workerRef.current) {
@@ -79,13 +74,15 @@ export const BarsGraphic: React.FC = () => {
         workerRef.current = null;
       }
     };
-  }, []); // Empty dependency array means this runs once on mount and once on unmount
+  }, []);
 
   // Determine the chart title based on the current data type
   const chartTitle =
     currentChartDataType === "population"
       ? `Total Population per Country (Aggregated from ${originalRecordCount} persons)`
-      : `Total Pets per Country (Aggregated from ${originalRecordCount} persons)`;
+      : currentChartDataType === "pets"
+      ? `Total Pets per Country (Aggregated from ${originalRecordCount} persons)`
+      : `Percentage of Total Pets per Country (Aggregated from ${originalRecordCount} persons)`; // New title for percentage chart
 
   return (
     <div className="AppContainer">
@@ -96,16 +93,14 @@ export const BarsGraphic: React.FC = () => {
           Worker.
         </p>
         <div className="button-group">
-          {" "}
-          {/* Added a div for button grouping */}
-          <button
+          {/* <button
             onClick={() => loadDataWithWorker("population")}
             disabled={loading || currentChartDataType === "population"}
           >
             {loading && currentChartDataType === "population"
               ? "Processing Population..."
               : "Show Population Chart"}
-          </button>
+          </button> */}
           <button
             onClick={() => loadDataWithWorker("pets")}
             disabled={loading || currentChartDataType === "pets"}
@@ -114,19 +109,29 @@ export const BarsGraphic: React.FC = () => {
               ? "Processing Pets..."
               : "Show Pets Chart"}
           </button>
+          <button
+            onClick={() => loadDataWithWorker("petsPercentage")} // New button for percentage chart
+            disabled={loading || currentChartDataType === "petsPercentage"}
+          >
+            {loading && currentChartDataType === "petsPercentage"
+              ? "Processing Pet %..."
+              : "Show Pet Percentage Chart"}
+          </button>
         </div>
       </header>
 
       <main className="App-main">
         {error && <p className="error-message">Error: {error}</p>}
-        {loading && (
-          <p>Loading and processing data. Your UI remains responsive!</p>
+        {loading && currentChartDataType && (
+          <p style={{ color: "gold" }}>
+            Loading and processing data. Your UI remains responsive!
+          </p>
         )}
-        {chartData && (
+        {chartData && currentChartDataType && (
           <BarChartDisplay
             labels={chartData.labels}
             values={chartData.values}
-            title={chartTitle} // Pass the dynamic title
+            title={chartTitle}
             dataType={currentChartDataType} // Pass the data type to BarChartDisplay
           />
         )}
