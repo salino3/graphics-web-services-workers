@@ -1,43 +1,56 @@
 import * as fs from "node:fs/promises";
 
-// 1. Definición de los países base (ahora serán los países finales del dataset)
-// Quitamos 'pop' y 'gdp' de aquí, ya que los calcularemos a partir de las personas.
-// 'area' se mantiene fija por país.
+// 1. Definition of base countries (used for assigning a country to each person)
 const baseCountriesDefinitions = [
-  { name: "United States", area: 9.8 },
-  { name: "China", area: 9.6 },
-  { name: "India", area: 3.2 },
-  { name: "Indonesia", area: 1.9 },
-  { name: "Pakistan", area: 0.8 },
-  { name: "Brazil", area: 8.5 },
-  { name: "Nigeria", area: 0.9 },
-  { name: "Bangladesh", area: 0.14 },
-  { name: "Russia", area: 17.1 },
-  { name: "Mexico", area: 2.0 },
-  { name: "Japan", area: 0.37 },
-  { name: "Philippines", area: 0.3 },
-  { name: "Ethiopia", area: 1.1 },
-  { name: "Egypt", area: 1.0 },
-  { name: "Germany", area: 0.35 },
-  { name: "France", area: 0.64 },
-  { name: "United Kingdom", area: 0.24 },
-  { name: "Italy", area: 0.3 },
-  { name: "Canada", area: 9.9 },
-  { name: "Australia", area: 7.6 },
+  { name: "United States", area: 9.8, avg: 2 },
+  { name: "China", area: 9.6, avg: 4 },
+  { name: "India", area: 3.2, avg: 8 },
+  { name: "Indonesia", area: 1.9, avg: 8 },
+  { name: "Pakistan", area: 0.8, avg: 5 },
+  { name: "Brazil", area: 8.5, avg: 2 },
+  { name: "Nigeria", area: 0.9, avg: 3 },
+  { name: "Bangladesh", area: 0.14, avg: 9 },
+  { name: "Russia", area: 17.1, avg: 3 },
+  { name: "Mexico", area: 2.0, avg: 2 },
+  { name: "Japan", area: 0.37, avg: 2 },
+  { name: "Philippines", area: 0.3, avg: 5 },
+  { name: "Ethiopia", area: 1.1, avg: 10 },
+  { name: "Egypt", area: 1.0, avg: 3 },
+  { name: "Germany", area: 0.35, avg: 2 },
+  { name: "France", area: 0.64, avg: 2 },
+  { name: "United Kingdom", area: 0.24, avg: 4 },
+  { name: "Italy", area: 0.3, avg: 5 },
+  { name: "Canada", area: 9.9, avg: 6 },
+  { name: "Australia", area: 7.6, avg: 7 },
 ];
 
-// 2. Función para generar datos de PERSONAS
+// 2. Interface for Person Data (includes age, work, awi, and pets)
 interface PersonData {
   id: number;
   country: string;
-  awi: number; // Aggregate Wage Income (Salario Neto Agregado)
+  age: number;
+  work: string;
+  awi: number; // Aggregate Wage Income
+  pets: number; // Number of pets this person has
 }
 
 const generatePersonsData = (numPersons: number): PersonData[] => {
-  console.log(`Generating ${numPersons} person records...`);
+  console.log(`Generating ${numPersons} raw person records...`);
   const persons: PersonData[] = [];
-  const baseAwiMin = 20000; // Salario mínimo base (USD)
-  const baseAwiMax = 70000; // Salario máximo base (USD)
+  const baseAwiMin = 20000; // Base minimum annual wage income (USD)
+  const baseAwiMax = 70000; // Base maximum annual wage income (USD)
+  const possibleWorks = [
+    "Teacher",
+    "Engineer",
+    "Doctor",
+    "Artist",
+    "Programmer",
+    "Chef",
+    "Student",
+    "Retired",
+    "Manager",
+    "Salesperson",
+  ];
 
   for (let i = 0; i < numPersons; i++) {
     const randomCountryDef =
@@ -46,103 +59,52 @@ const generatePersonsData = (numPersons: number): PersonData[] => {
       ];
     const awi = Math.floor(
       baseAwiMin + Math.random() * (baseAwiMax - baseAwiMin)
-    ); // Salario aleatorio dentro de un rango
+    );
+    const age = Math.floor(18 + Math.random() * 60); // Age between 18 and 77
+    const work =
+      possibleWorks[Math.floor(Math.random() * possibleWorks.length)];
+    const pets = Math.floor(Math.random() * randomCountryDef.avg); // 0 to X pets
 
     persons.push({
       id: i + 1,
       country: randomCountryDef.name,
+      age: age,
+      work: work,
       awi: awi,
+      pets: pets,
     });
   }
   return persons;
 };
 
-// 3. Función para AGREGAR datos de PERSONAS a datos de PAÍSES
-interface AggregatedCountryData {
-  id: number;
-  countryName: string;
-  population: number; // Total de personas en ese país
-  areaSqKm: number; // Área fija del país
-  aggregateWageIncome: number; // Suma de AWI de todas las personas en el país
-}
-
-const aggregatePersonsToCountries = (
-  persons: PersonData[]
-): AggregatedCountryData[] => {
-  console.log("Aggregating person data into country summaries...");
-  const countryMap = new Map<
-    string,
-    { population: number; totalAwi: number }
-  >();
-
-  // Inicializar el mapa con los países base y sus propiedades fijas
-  baseCountriesDefinitions.forEach((countryDef) => {
-    countryMap.set(countryDef.name, { population: 0, totalAwi: 0 });
-  });
-
-  // Iterar sobre las personas y agregar sus datos
-  persons.forEach((person) => {
-    const countryStats = countryMap.get(person.country);
-    if (countryStats) {
-      countryStats.population++; // Cada persona cuenta como 1 en la población
-      countryStats.totalAwi += person.awi;
-    }
-  });
-
-  // Formatear los datos agregados en el formato final de países
-  const aggregatedData: AggregatedCountryData[] = [];
-  let idCounter = 1;
-
-  baseCountriesDefinitions.forEach((countryDef) => {
-    const stats = countryMap.get(countryDef.name);
-    if (stats) {
-      aggregatedData.push({
-        id: idCounter++,
-        countryName: countryDef.name, // Nombre de país fijo, sin números
-        population: stats.population, // Población calculada por el número de personas
-        areaSqKm: countryDef.area, // Área fija
-        aggregateWageIncome: parseFloat(
-          (stats.totalAwi / 1_000_000_000).toFixed(2) // Convertir a Billions USD para AWI
-        ),
-      });
-    }
-  });
-
-  return aggregatedData;
-};
-
-// 4. Función principal de ejecución
+// 3. Main execution function
 const runGenerator = async () => {
-  console.log("Starting data generation and aggregation process...");
-  const numberOfPersons = 1_000_000; // Generaremos 1 millón de personas para tener una población significativa por país
-  const outputFileName = `large_country_data_${numberOfPersons}_persons.json`; // Nombre de archivo más descriptivo
+  console.log("Starting raw data generation process...");
+  const numberOfPersons = 1_000_000; // Generate 1 million raw person records
+  // New output file name to reflect it's raw person data
+  const outputFileName = `raw_persons_data_${numberOfPersons}.json`;
 
-  // Paso 1: Generar los datos de las personas
+  // Step 1: Generate the raw person data
   const personsData = generatePersonsData(numberOfPersons);
 
-  // Paso 2: Agregarlos a datos de país únicos
-  const aggregatedCountryData = aggregatePersonsToCountries(personsData);
-
+  console.log(`Attempting to write raw person data to: ${outputFileName}`);
   console.log(
-    `Attempting to write aggregated country data to: ${outputFileName}`
+    `Raw data contains ${personsData.length} individual person records.`
   );
   console.log(
-    `Aggregated data contains ${aggregatedCountryData.length} unique countries.`
-  );
-  console.log(
-    `Total size of aggregated data (approx): ${
-      JSON.stringify(aggregatedCountryData).length / (1024 * 1024)
+    `Total size of raw data (approx): ${
+      JSON.stringify(personsData).length / (1024 * 1024)
     } MB`
   );
 
   try {
     await fs.writeFile(
       outputFileName,
-      JSON.stringify(aggregatedCountryData, null, 2),
+      JSON.stringify(personsData, null, 2),
       "utf8"
     );
     console.log(
-      `Successfully generated and aggregated ${aggregatedCountryData.length} country records from ${numberOfPersons} persons into ${outputFileName}`
+      `Successfully generated ${personsData.length} raw person records into ${outputFileName}`
     );
   } catch (error: any) {
     console.error(
