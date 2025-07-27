@@ -80,7 +80,7 @@ const generatePersonsData = (numPersons: number): PersonData[] => {
 // 3. Main execution function
 const runGenerator = async () => {
   console.log("Starting raw data generation process...");
-  const numberOfPersons = 1_000_000; // Generate 1 million raw person records
+  const numberOfPersons = 800_000; // Generate 8 mils raw person records
   // New output file name to reflect it's raw person data
   const outputFileName = `raw_persons_data_${numberOfPersons}.json`;
 
