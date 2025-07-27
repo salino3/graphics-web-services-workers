@@ -19,28 +19,57 @@
     color: white;
     margin-bottom: 30px;
     border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
 
     h1 {
       margin-bottom: 10px;
     }
 
-    button {
-      padding: 10px 20px;
-      font-size: 1.1rem;
-      background-color: #61dafb;
-      color: #282c34;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
+    .clear {
+      padding: 0.5rem 1rem;
+      border-radius: 0.5rem;
+      background-color: red;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), -1px -1px 8px rgba(0, 0, 0, 0.3);
+      color: white;
 
-      &:hover:not(:disabled) {
-        background-color: #21a1f1;
+      &:active {
+        opacity: 0.4;
       }
 
-      &:disabled {
-        background-color: #cccccc;
-        cursor: not-allowed;
+      &:hover {
+        transform: translateY(-1.5px);
+      }
+    }
+
+    .button-group {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      .button {
+        padding: 10px 20px;
+        font-size: 1.1rem;
+        background-color: #61dafb;
+        color: #282c34;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+
+        &:hover:not(:disabled) {
+          background-color: #21a1f1;
+        }
+
+        &:disabled {
+          background-color: #cccccc;
+          cursor: not-allowed;
+        }
       }
     }
   }
