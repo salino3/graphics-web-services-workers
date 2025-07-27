@@ -131,7 +131,10 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
   };
 
   return (
-    <div style={{ width: "100%", margin: "auto" }}>
+    <div
+      className="centerRow"
+      style={{ maxHeight: "400px", width: "100%", margin: "auto" }}
+    >
       <Bar data={data} options={options} />
     </div>
   );
