@@ -191,7 +191,13 @@ export const BarsGraphic: React.FC = () => {
           />
         )}
         {!loading && !chartData && !error && (
-          <p>Please select a chart type to load data.</p>
+          <p
+            style={{
+              color: "black",
+            }}
+          >
+            Please select a chart type to load data.
+          </p>
         )}
       </main>
     </div>
