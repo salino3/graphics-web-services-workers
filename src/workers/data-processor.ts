@@ -1,5 +1,4 @@
 self.onmessage = async (event: MessageEvent) => {
-  // Expected message: { type: 'loadData', payload: '/path/to/data.json' }
   if (event.data.type === "loadData") {
     const filePath = event.data.payload;
     try {
