@@ -24,21 +24,26 @@ interface BarChartDisplayProps {
   labels: string[];
   values: number[];
   title: string;
+  dataType: "population" | "pets"; // New prop to indicate data type
 }
-
-// src/pods/bars-graphic/components/bar-charts-display.component.tsx
-// ... (imports y register se mantienen)
 
 export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
   labels,
   values,
-  title, // Este título lo pasa el componente padre
+  title,
+  dataType, // Destructure the new dataType prop
 }) => {
+  // Determine dataset label and Y-axis title based on dataType
+  const datasetLabel =
+    dataType === "population" ? "Total Population (Persons)" : "Total Pets";
+  const yAxisTitle =
+    dataType === "population" ? "Number of Persons" : "Number of Pets";
+
   const data = {
-    labels: labels, // Ahora serán nombres de países
+    labels: labels, // These are now the country names
     datasets: [
       {
-        label: "Total Population", // Etiqueta del dataset, no en millones si la pop es la cuenta
+        label: datasetLabel, // Dynamic label for the dataset
         data: values,
         backgroundColor: "rgba(75, 192, 192, 0.6)",
         borderColor: "rgba(75, 192, 192, 1)",
@@ -55,12 +60,12 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
       },
       title: {
         display: true,
-        text: title, // Usar el título pasado por props
+        text: title, // Use the title passed from the parent component
       },
       tooltip: {
         callbacks: {
           title: function (context: any) {
-            // Ahora el título del tooltip será el nombre completo del país
+            // Tooltip title will be the country name
             return `Country: ${context[0].label}`;
           },
           label: function (context: any) {
@@ -69,11 +74,12 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
               label += ": ";
             }
             if (context.parsed.y !== null) {
-              // Formatear la población
+              // Format the value based on dataType
               label += new Intl.NumberFormat("en-US", {
                 style: "decimal",
               }).format(context.parsed.y);
-              label += " persons"; // O "people" para ser más general
+              // Dynamic suffix for the value (persons or pets)
+              label += dataType === "population" ? " persons" : " pets";
             }
             return label;
           },
@@ -85,13 +91,13 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
       x: {
         title: {
           display: true,
-          text: "Country", // Ahora es el nombre completo del país
+          text: "Country", // X-axis title is always "Country"
         },
       },
       y: {
         title: {
           display: true,
-          text: "Total Population (Persons)", // Título del eje Y más específico
+          text: yAxisTitle, // Dynamic Y-axis title based on dataType
         },
         beginAtZero: true,
       },
