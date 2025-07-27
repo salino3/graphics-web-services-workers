@@ -3,7 +3,7 @@ import { BarChartDisplay } from "./components/bar-charts-display.component";
 import "./bars-graphic.styles.scss";
 
 // Define the types of data that can be displayed
-type ChartDataType = "" | "population" | "pets" | "petsPercentage"; // Added 'petsPercentage'
+type ChartDataType = "" | "population" | "pets" | "petsPercentage";
 
 export const BarsGraphic: React.FC = () => {
   const [chartData, setChartData] = useState<{
