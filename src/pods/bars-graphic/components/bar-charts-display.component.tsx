@@ -26,16 +26,19 @@ interface BarChartDisplayProps {
   title: string;
 }
 
+// src/pods/bars-graphic/components/bar-charts-display.component.tsx
+// ... (imports y register se mantienen)
+
 export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
   labels,
   values,
-  title,
+  title, // Este título lo pasa el componente padre
 }) => {
   const data = {
-    labels: labels,
+    labels: labels, // Ahora serán nombres de países
     datasets: [
       {
-        label: "Population (Millions)",
+        label: "Total Population", // Etiqueta del dataset, no en millones si la pop es la cuenta
         data: values,
         backgroundColor: "rgba(75, 192, 192, 0.6)",
         borderColor: "rgba(75, 192, 192, 1)",
@@ -52,20 +55,43 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
       },
       title: {
         display: true,
-        text: title,
+        text: title, // Usar el título pasado por props
+      },
+      tooltip: {
+        callbacks: {
+          title: function (context: any) {
+            // Ahora el título del tooltip será el nombre completo del país
+            return `Country: ${context[0].label}`;
+          },
+          label: function (context: any) {
+            let label = context.dataset.label || "";
+            if (label) {
+              label += ": ";
+            }
+            if (context.parsed.y !== null) {
+              // Formatear la población
+              label += new Intl.NumberFormat("en-US", {
+                style: "decimal",
+              }).format(context.parsed.y);
+              label += " persons"; // O "people" para ser más general
+            }
+            return label;
+          },
+        },
       },
     },
+
     scales: {
       x: {
         title: {
           display: true,
-          text: "Country Initial Category",
+          text: "Country", // Ahora es el nombre completo del país
         },
       },
       y: {
         title: {
           display: true,
-          text: "Total Population",
+          text: "Total Population (Persons)", // Título del eje Y más específico
         },
         beginAtZero: true,
       },
