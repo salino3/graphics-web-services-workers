@@ -1,3 +1,4 @@
+// src/workers/data-processor.ts
 self.onmessage = async (event: MessageEvent) => {
   if (event.data.type === "loadData") {
     const filePath = event.data.payload;
@@ -8,39 +9,23 @@ self.onmessage = async (event: MessageEvent) => {
         throw new Error(`HTTP error! status: ${response.status}`);
       }
       const rawData = await response.json();
-      console.log(`Worker: Fetched ${rawData.length} records.`);
+      console.log(`Worker: Fetched ${rawData.length} country records.`); // Ahora serán 20 records
 
-      // --- Data Processing Example ---
-      // Let's aggregate population by a simplified 'continent' category
-      // For simplicity, we'll just pick the first letter of the country name as a "category"
-      // In a real app, you'd have more complex aggregation logic.
-      const aggregatedData: { [key: string]: number } = {};
+      // --- Data Processing (simplified for new structure) ---
       const processedLabels: string[] = [];
       const processedValues: number[] = [];
 
-      // Group data by a simplified "category" (e.g., first letter of country)
       rawData.forEach((item: any) => {
-        const category = item.countryName
-          ? item.countryName.charAt(0).toUpperCase()
-          : "Other";
-        if (!aggregatedData[category]) {
-          aggregatedData[category] = 0;
-        }
-        aggregatedData[category] += item.population; // Summing population
+        processedLabels.push(item.countryName); // Usar el nombre del país directamente
+        processedValues.push(item.population); // Usar la población agregada
       });
-
-      // Prepare for Chart.js format
-      for (const category in aggregatedData) {
-        processedLabels.push(category);
-        processedValues.push(aggregatedData[category]);
-      }
 
       console.log("Worker: Data processed. Sending results back.");
       self.postMessage({
         type: "dataReady",
         labels: processedLabels,
         values: processedValues,
-        originalRecordCount: rawData.length, // Useful for debugging/display
+        originalRecordCount: rawData.length, // Ahora es el número de países únicos
       });
     } catch (error: any) {
       console.error("Worker: Error processing data:", error);

@@ -48,7 +48,7 @@ export const BarsGraphic: React.FC = () => {
         workerRef.current = null;
       }
     };
-  }, []); // Empty dependency array means this runs once on mount and once on unmount
+  }, []);
 
   const loadDataWithWorker = () => {
     setLoading(true);
@@ -56,7 +56,7 @@ export const BarsGraphic: React.FC = () => {
     setChartData(null);
     setOriginalRecordCount(0);
 
-    const jsonPath = import.meta.env.BASE_URL + "data.json";
+    const jsonPath = import.meta.env.BASE_URL + "data_persons.json";
 
     if (workerRef.current) {
       // Send a message to the worker to start processing
@@ -90,7 +90,7 @@ export const BarsGraphic: React.FC = () => {
           <BarChartDisplay
             labels={chartData.labels}
             values={chartData.values}
-            title={`Population by Country Initial (from ${originalRecordCount} records)`}
+            title={`Total Population per Country`}
           />
         )}
       </main>
