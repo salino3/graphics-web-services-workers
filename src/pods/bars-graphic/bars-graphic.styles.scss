@@ -7,11 +7,16 @@
   height: 100%;
   width: 100%;
   flex-grow: 1;
+  padding: 0 2rem; // User's addition
 }
 
 .AppContainer {
   text-align: center;
   padding: 20px;
+  width: 100%; // Ensure it takes full width on smaller screens
+  max-width: 1200px; // Limit max width on larger screens
+  margin: 0 auto; // Center the container
+  overflow-x: auto; // ADDED: Allows horizontal scrolling if content overflows
 
   .App-header {
     background-color: #282c34;
@@ -20,38 +25,69 @@
     margin-bottom: 30px;
     border-radius: 8px;
     display: flex;
-    flex-direction: column;
+    flex-direction: column; // Already column, good for mobile
     justify-content: center;
     align-items: center;
     gap: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Added subtle shadow
 
     h1 {
       margin-bottom: 10px;
+      font-size: 2.5rem; // Default for desktop
+      @media (max-width: 768px) {
+        // Tablet and smaller
+        font-size: 2rem;
+      }
+      @media (max-width: 480px) {
+        // Mobile
+        font-size: 1.5rem;
+      }
+    }
+
+    p {
+      font-size: 1.1rem;
+      @media (max-width: 480px) {
+        font-size: 0.9rem;
+      }
     }
 
     .clear {
       padding: 0.5rem 1rem;
       border-radius: 0.5rem;
-      background-color: red;
+      background-color: #dc3545; // More standard red for clear/danger
       transition: all 0.2s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), -1px -1px 8px rgba(0, 0, 0, 0.3);
       color: white;
+      font-weight: bold;
+      border: none;
+      cursor: pointer;
 
       &:active {
-        opacity: 0.4;
+        opacity: 0.7; // Changed from 0.4 for better visibility
       }
 
       &:hover {
-        transform: translateY(-1.5px);
+        transform: translateY(-2px); // Slightly more pronounced hover
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4),
+          -2px -2px 10px rgba(0, 0, 0, 0.4);
       }
     }
 
     .button-group {
       display: flex;
-      flex-direction: row;
+      flex-direction: row; // Default for desktop
       justify-content: center;
       align-items: center;
       gap: 1rem;
+      flex-wrap: wrap; // Allow buttons to wrap to next line if space is limited
+
+      @media (max-width: 768px) {
+        // Tablet and smaller
+        flex-direction: column; // Stack buttons vertically
+        width: 100%; // Take full width
+        gap: 0.8rem;
+      }
+
       .button {
         padding: 10px 20px;
         font-size: 1.1rem;
@@ -60,29 +96,57 @@
         border: none;
         border-radius: 5px;
         cursor: pointer;
-        transition: background-color 0.3s ease;
+        transition: background-color 0.3s ease, transform 0.2s ease,
+          box-shadow 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); // Added subtle shadow to buttons
+
+        @media (max-width: 768px) {
+          width: 80%; // Make buttons wider on mobile/tablet
+          font-size: 1rem;
+          padding: 12px 15px;
+        }
+        @media (max-width: 480px) {
+          width: 90%; // Even wider on very small screens
+        }
 
         &:hover:not(:disabled) {
           background-color: #21a1f1;
+          transform: translateY(-2px); // Lift button on hover
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); // More pronounced shadow on hover
         }
 
         &:disabled {
           background-color: #cccccc;
           cursor: not-allowed;
+          opacity: 0.7; // Make disabled buttons slightly transparent
         }
       }
     }
   }
 
   .App-main {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
     padding: 20px;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    margin-top: 20px; // Add some top margin
+    min-width: 600px; // User's addition
+    min-height: 300px; // User's addition
 
     .error-message {
       color: red;
       font-weight: bold;
+    }
+
+    p {
+      font-size: 1.1rem;
+      @media (max-width: 480px) {
+        font-size: 0.9rem;
+      }
     }
   }
 }
