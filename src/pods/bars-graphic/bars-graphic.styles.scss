@@ -1,22 +1,19 @@
-.rootBarsGraphic {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 1rem;
-  height: 100%;
-  width: 100%;
-  flex-grow: 1;
-  padding: 0 2rem; // User's addition
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .AppContainer {
   text-align: center;
   padding: 20px;
-  width: 100%; // Ensure it takes full width on smaller screens
-  max-width: 1200px; // Limit max width on larger screens
-  margin: 0 auto; // Center the container
-  overflow-x: auto; // ADDED: Allows horizontal scrolling if content overflows
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  overflow-x: auto;
 
   .App-header {
     background-color: #282c34;
@@ -25,21 +22,19 @@
     margin-bottom: 30px;
     border-radius: 8px;
     display: flex;
-    flex-direction: column; // Already column, good for mobile
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 1rem;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); // Added subtle shadow
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 
     h1 {
       margin-bottom: 10px;
-      font-size: 2.5rem; // Default for desktop
+      font-size: 2.5rem;
       @media (max-width: 768px) {
-        // Tablet and smaller
         font-size: 2rem;
       }
       @media (max-width: 480px) {
-        // Mobile
         font-size: 1.5rem;
       }
     }
@@ -54,7 +49,7 @@
     .clear {
       padding: 0.5rem 1rem;
       border-radius: 0.5rem;
-      background-color: #dc3545; // More standard red for clear/danger
+      background-color: #dc3545;
       transition: all 0.2s ease;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3), -1px -1px 8px rgba(0, 0, 0, 0.3);
       color: white;
@@ -63,28 +58,37 @@
       cursor: pointer;
 
       &:active {
-        opacity: 0.7; // Changed from 0.4 for better visibility
+        opacity: 0.7;
       }
 
       &:hover {
-        transform: translateY(-2px); // Slightly more pronounced hover
+        transform: translateY(-2px);
         box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4),
           -2px -2px 10px rgba(0, 0, 0, 0.4);
+      }
+
+      &:hover:not(:disabled) {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      &:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        opacity: 0.7;
       }
     }
 
     .button-group {
       display: flex;
-      flex-direction: row; // Default for desktop
+      flex-direction: row;
       justify-content: center;
       align-items: center;
       gap: 1rem;
-      flex-wrap: wrap; // Allow buttons to wrap to next line if space is limited
+      flex-wrap: wrap;
 
       @media (max-width: 768px) {
-        // Tablet and smaller
-        flex-direction: column; // Stack buttons vertically
-        width: 100%; // Take full width
+        flex-direction: column;
+        width: 100%;
         gap: 0.8rem;
       }
 
@@ -98,10 +102,10 @@
         cursor: pointer;
         transition: background-color 0.3s ease, transform 0.2s ease,
           box-shadow 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); // Added subtle shadow to buttons
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 
         @media (max-width: 768px) {
-          width: 80%; // Make buttons wider on mobile/tablet
+          width: 80%;
           font-size: 1rem;
           padding: 12px 15px;
         }
@@ -111,20 +115,20 @@
 
         &:hover:not(:disabled) {
           background-color: #21a1f1;
-          transform: translateY(-2px); // Lift button on hover
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3); // More pronounced shadow on hover
+          transform: translateY(-2px);
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         &:disabled {
           background-color: #cccccc;
           cursor: not-allowed;
-          opacity: 0.7; // Make disabled buttons slightly transparent
+          opacity: 0.7;
         }
       }
     }
   }
 
-  .App-main {
+  .AppMain {
     display: flex;
     flex-direction: row;
     justify-content: center;
@@ -133,19 +137,42 @@
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-top: 20px; // Add some top margin
-    min-width: 600px; // User's addition
-    min-height: 300px; // User's addition
+    margin-top: 20px;
+    min-width: 600px;
+    min-height: 300px;
 
     .error-message {
       color: red;
       font-weight: bold;
     }
 
-    p {
+    .pLoading {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
       font-size: 1.1rem;
       @media (max-width: 480px) {
         font-size: 0.9rem;
+      }
+
+      span {
+        padding: 1rem;
+        min-width: 1rem;
+        max-width: 1rem;
+        min-height: 1rem;
+        max-height: 1rem;
+        border-radius: 50%;
+        // Estilos para el efecto de carga: un borde que gira
+        border: solid 2px rgba(255, 255, 255, 0.2); // Borde transparente o semi-transparente
+        border-top-color: gold; // Color sólido en la parte superior para el efecto de movimiento
+        box-shadow: 0 0 5px gold; // Sombra para un efecto de resplandor
+        animation: spin 1s linear infinite; // Aplica la animación 'spin'
+
+        @media (prefers-reduced-motion) {
+          animation: none;
+        }
       }
     }
   }
