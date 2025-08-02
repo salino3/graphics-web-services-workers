@@ -1,13 +1,10 @@
-.rootBarsGraphic {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 1rem;
-  height: 100%;
-  width: 100%;
-  flex-grow: 1;
-  padding: 0 2rem;
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .AppContainer {
@@ -150,6 +147,11 @@
     }
 
     .pLoading {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
       font-size: 1.1rem;
       @media (max-width: 480px) {
         font-size: 0.9rem;
@@ -162,6 +164,15 @@
         min-height: 1rem;
         max-height: 1rem;
         border-radius: 50%;
+        // Estilos para el efecto de carga: un borde que gira
+        border: solid 2px rgba(255, 255, 255, 0.2); // Borde transparente o semi-transparente
+        border-top-color: gold; // Color sólido en la parte superior para el efecto de movimiento
+        box-shadow: 0 0 5px gold; // Sombra para un efecto de resplandor
+        animation: spin 1s linear infinite; // Aplica la animación 'spin'
+
+        @media (prefers-reduced-motion) {
+          animation: none;
+        }
       }
     }
   }
