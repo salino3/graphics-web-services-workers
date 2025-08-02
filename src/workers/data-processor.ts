@@ -70,6 +70,7 @@ const writePersonsToDB = async (persons: any[]): Promise<void> => {
     const transaction = db.transaction([STORE_NAME], "readwrite");
     const objectStore = transaction.objectStore(STORE_NAME);
 
+    // Event Listener after everything is done in the transaction objects
     transaction.oncomplete = () => {
       console.log("Worker: All persons written to IndexDB.");
       // FIX: Close the database connection after the transaction completes
@@ -77,6 +78,7 @@ const writePersonsToDB = async (persons: any[]): Promise<void> => {
       resolve();
     };
 
+    // Event Listener after everything is done in the transaction objects
     transaction.onerror = (event) => {
       console.error(
         "Worker: Error writing to IndexDB:",
