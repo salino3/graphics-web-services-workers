@@ -68,6 +68,7 @@ export const BarsGraphic: React.FC = () => {
     const worker = new Worker(
       new URL("../../workers/data-processor.ts", import.meta.url)
     );
+
     workerRef.current = worker;
 
     // Listen for messages from the worker
@@ -128,6 +129,7 @@ export const BarsGraphic: React.FC = () => {
           Data is generated and stored locally using IndexDB in a Web Worker,
           ensuring a responsive UI and offline capabilities.
         </p>
+
         <button
           className="clear"
           onClick={() => {
@@ -141,6 +143,7 @@ export const BarsGraphic: React.FC = () => {
               workerRef.current.postMessage({ type: "clearData" });
             }
           }}
+          disabled={loading}
         >
           Clear Data & IndexDB
         </button>
@@ -179,10 +182,10 @@ export const BarsGraphic: React.FC = () => {
         </div>
       </header>
 
-      <main className="App-main">
+      <main className="AppMain">
         {error && <p className="error-message">Error: {error}</p>}
         {loading && currentChartDataType && (
-          <p style={{ color: "gold" }}>
+          <p className="pLoading" style={{ color: "gold" }}>
             Loading and processing data. Your UI remains responsive!{" "}
             <span></span>
           </p>

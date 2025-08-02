@@ -5,17 +5,13 @@ const DB_NAME = "PersonDataDB";
 const DB_VERSION = 1;
 const STORE_NAME = "persons";
 
-let db: IDBDatabase | null = null;
-let cachedRawPersonsData: any[] | null = null; // Still useful for in-memory caching during a session
+let isProcessing: boolean = false; // State flag to prevent race conditions
 
 // Utility function to open and get the database instance
+// This function no longer caches the database connection.
+// It will always open a new connection, and the caller must close it.
 const openDatabase = (): Promise<IDBDatabase> => {
   return new Promise((resolve, reject) => {
-    if (db) {
-      resolve(db);
-      return;
-    }
-
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = (event) => {
@@ -26,7 +22,7 @@ const openDatabase = (): Promise<IDBDatabase> => {
     };
 
     request.onsuccess = (event) => {
-      db = (event.target as IDBOpenDBRequest).result;
+      const db = (event.target as IDBOpenDBRequest).result;
       resolve(db);
     };
 
@@ -42,9 +38,9 @@ const openDatabase = (): Promise<IDBDatabase> => {
 
 // Utility function to read all data from the object store
 const readAllPersonsFromDB = async (): Promise<any[]> => {
-  const database = await openDatabase();
+  const db = await openDatabase();
   return new Promise((resolve, reject) => {
-    const transaction = database.transaction([STORE_NAME], "readonly");
+    const transaction = db.transaction([STORE_NAME], "readonly");
     const objectStore = transaction.objectStore(STORE_NAME);
     const request = objectStore.getAll();
 
@@ -59,41 +55,44 @@ const readAllPersonsFromDB = async (): Promise<any[]> => {
       );
       reject((event.target as IDBRequest).error);
     };
+
+    // FIX: Ensure the database connection is closed after the transaction completes
+    transaction.oncomplete = () => {
+      db.close();
+    };
   });
 };
 
 // Utility function to write data to the object store
 const writePersonsToDB = async (persons: any[]): Promise<void> => {
-  const database = await openDatabase();
+  const db = await openDatabase();
   return new Promise((resolve, reject) => {
-    const transaction = database.transaction([STORE_NAME], "readwrite");
+    const transaction = db.transaction([STORE_NAME], "readwrite");
     const objectStore = transaction.objectStore(STORE_NAME);
 
-    // Event Listener about 'transaction' objects
     transaction.oncomplete = () => {
       console.log("Worker: All persons written to IndexDB.");
+      // FIX: Close the database connection after the transaction completes
+      db.close();
       resolve();
     };
 
-    // Event Listener about 'transaction' objects
     transaction.onerror = (event) => {
       console.error(
         "Worker: Error writing to IndexDB:",
         (event.target as IDBTransaction).error
       );
+      // FIX: Close the database connection even if there's an error
+      db.close();
       reject((event.target as IDBTransaction).error);
     };
 
     persons.forEach((person) => {
-      objectStore.put(person); // Use put to add or update
+      objectStore.put(person);
     });
   });
 };
 
-// Remove the import for 'node:fs/promises' as it's not needed in the browser
-// import * as fs from "node:fs/promises"; // DELETE THIS LINE
-
-// 1. Definition of base countries (used for assigning a country to each person)
 const baseCountriesDefinitions = [
   { name: "United States", area: 9.8, avg: 2 },
   { name: "China", area: 9.6, avg: 4 },
@@ -117,7 +116,6 @@ const baseCountriesDefinitions = [
   { name: "Australia", area: 7.6, avg: 7 },
 ];
 
-// 2. Interface for Person Data (includes age, work, awi, and pets)
 interface PersonData {
   id: number;
   country: string;
@@ -127,7 +125,6 @@ interface PersonData {
   pets: number; // Number of pets this person has
 }
 
-// THIS IS THE GENERATION LOGIC - MOVED FROM large-data-generator.ts
 const generatePersonsData = (numPersons: number): PersonData[] => {
   console.log(`Worker: Generating ${numPersons} raw person records...`);
   const persons: PersonData[] = [];
@@ -171,48 +168,74 @@ const generatePersonsData = (numPersons: number): PersonData[] => {
   return persons;
 };
 
+// Refactored clear database logic into an awaitable Promise
+const clearDatabaseAndCache = (): Promise<void> => {
+  return new Promise((resolve, reject) => {
+    // FIX: No need to close the database here anymore, as the read/write functions
+    // now handle their own connections. This prevents the "Deletion blocked" error.
+
+    const request = indexedDB.deleteDatabase(DB_NAME);
+
+    request.onsuccess = () => {
+      console.log("Worker: IndexDB deleted successfully.");
+      resolve(); // Resolve the promise on success
+    };
+
+    request.onerror = (event) => {
+      const error = (event.target as IDBRequest).error;
+      console.error("Worker: Error deleting IndexDB:", error);
+      reject(error); // Reject the promise on error
+    };
+
+    request.onblocked = () => {
+      console.warn(
+        "Worker: Deletion blocked. Close all connections to the database."
+      );
+      reject(new Error("Database deletion blocked."));
+    };
+  });
+};
+
 // 3. Main execution logic within the worker's onmessage handler
 // self: Reference at Web Worker itself.
 // onmessage: It is a browser event that listens for messages received from the main thread of the application.
 self.onmessage = async (event: MessageEvent) => {
+  if (isProcessing) {
+    console.warn(
+      "Worker: Ignoring message as another operation is in progress."
+    );
+    return;
+  }
+  isProcessing = true;
+
   if (event.data.type === "loadData") {
-    // We no longer need filePath, as data will be from IndexDB or generated
     const dataType = event.data.dataType;
 
     try {
       let rawPersonsData: any[];
 
-      // Try to read from in-memory cache first (for current session)
-      if (cachedRawPersonsData) {
-        console.log(
-          `Worker: Using in-memory cached raw data for ${dataType} chart.`
-        );
-        rawPersonsData = cachedRawPersonsData;
-      } else {
-        // Then try to read from IndexDB
-        console.log("Worker: Checking IndexDB for raw data...");
-        rawPersonsData = await readAllPersonsFromDB();
+      // FIX: Removed the in-memory cache to simplify the flow.
+      // We will now always read from IndexedDB, which ensures the data is consistent
+      // after a successful "Clear" operation.
+      console.log("Worker: Checking IndexDB for raw data...");
+      rawPersonsData = await readAllPersonsFromDB();
 
-        if (rawPersonsData.length === 0) {
-          // Data not in IndexDB, so generate it
-          console.log(
-            "Worker: Data not found in IndexDB. Generating new data..."
-          );
-          const numberOfPersonsToGenerate = 1_000_000; // Define your desired number of persons here
-          rawPersonsData = generatePersonsData(numberOfPersonsToGenerate);
-          await writePersonsToDB(rawPersonsData); // Write to IndexDB for future use
-          console.log(
-            `Worker: Generated and saved ${rawPersonsData.length} records to IndexDB.`
-          );
-        } else {
-          console.log(
-            `Worker: Loaded ${rawPersonsData.length} records from IndexDB.`
-          );
-        }
-        cachedRawPersonsData = rawPersonsData; // Cache in memory for subsequent requests in this session
+      if (rawPersonsData.length === 0) {
+        console.log(
+          "Worker: Data not found in IndexDB. Generating new data..."
+        );
+        const numberOfPersonsToGenerate = 1_000_000;
+        rawPersonsData = generatePersonsData(numberOfPersonsToGenerate);
+        await writePersonsToDB(rawPersonsData);
+        console.log(
+          `Worker: Generated and saved ${rawPersonsData.length} records to IndexDB.`
+        );
+      } else {
+        console.log(
+          `Worker: Loaded ${rawPersonsData.length} records from IndexDB.`
+        );
       }
 
-      // --- AGGREGATION LOGIC (remains mostly the same) ---
       const countryMap = new Map<
         string,
         { population: number; totalPets: number }
@@ -232,7 +255,6 @@ self.onmessage = async (event: MessageEvent) => {
 
       const processedLabels: string[] = [];
       const processedValues: number[] = [];
-
       const sortedCountryNames = Array.from(countryMap.keys()).sort();
 
       sortedCountryNames.forEach((countryName) => {
@@ -254,7 +276,6 @@ self.onmessage = async (event: MessageEvent) => {
         `Worker: Data processed. Aggregated into ${processedLabels.length} unique countries. Sending results back.`
       );
 
-      // Web Worker send object to main thread
       self.postMessage({
         type: "dataReady",
         labels: processedLabels,
@@ -267,25 +288,10 @@ self.onmessage = async (event: MessageEvent) => {
       self.postMessage({ type: "error", message: error.message });
     }
   } else if (event.data.type === "clearData") {
-    // NEW: Handle clear data message to delete IndexDB and in-memory cache
     console.log("Worker: Clearing IndexDB and in-memory cache...");
     try {
-      await openDatabase(); // Ensure DB is open
-      const request = indexedDB.deleteDatabase(DB_NAME);
-      request.onsuccess = () => {
-        console.log("Worker: IndexDB deleted successfully.");
-        db = null; // Reset db reference
-        cachedRawPersonsData = null; // Clear in-memory cache
-        self.postMessage({ type: "dataCleared" });
-      };
-      request.onerror = (event) => {
-        const error = (event.target as IDBRequest).error;
-        console.error("Worker: Error deleting IndexDB:", error);
-        self.postMessage({
-          type: "error",
-          message: `Failed to clear IndexDB: ${error?.message}`,
-        });
-      };
+      await clearDatabaseAndCache();
+      self.postMessage({ type: "dataCleared" });
     } catch (error: any) {
       console.error("Worker: Error during clear process:", error);
       self.postMessage({
@@ -294,4 +300,5 @@ self.onmessage = async (event: MessageEvent) => {
       });
     }
   }
+  isProcessing = false; // Reset the flag once the operation is complete
 };
