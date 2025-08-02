@@ -69,11 +69,13 @@ const writePersonsToDB = async (persons: any[]): Promise<void> => {
     const transaction = database.transaction([STORE_NAME], "readwrite");
     const objectStore = transaction.objectStore(STORE_NAME);
 
+    // Event Listener about 'transaction' objects
     transaction.oncomplete = () => {
       console.log("Worker: All persons written to IndexDB.");
       resolve();
     };
 
+    // Event Listener about 'transaction' objects
     transaction.onerror = (event) => {
       console.error(
         "Worker: Error writing to IndexDB:",
@@ -170,6 +172,8 @@ const generatePersonsData = (numPersons: number): PersonData[] => {
 };
 
 // 3. Main execution logic within the worker's onmessage handler
+// self: Reference at Web Worker itself.
+// onmessage: It is a browser event that listens for messages received from the main thread of the application.
 self.onmessage = async (event: MessageEvent) => {
   if (event.data.type === "loadData") {
     // We no longer need filePath, as data will be from IndexDB or generated
@@ -249,6 +253,8 @@ self.onmessage = async (event: MessageEvent) => {
       console.log(
         `Worker: Data processed. Aggregated into ${processedLabels.length} unique countries. Sending results back.`
       );
+
+      // Web Worker send object to main thread
       self.postMessage({
         type: "dataReady",
         labels: processedLabels,
