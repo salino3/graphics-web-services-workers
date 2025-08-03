@@ -114,14 +114,13 @@ export const BarsGraphic: React.FC = () => {
       ? `Total Pets per Country (Aggregated from ${originalRecordCount} persons)`
       : `Percentage of Total Pets per Country (Aggregated from ${originalRecordCount} persons)`;
 
-  console.log("clog1", cachedProcessedData);
   return (
     <div className="AppContainer">
       <header className="App-header">
         <h1>Country Data Visualization with Web Workers</h1>
         <p>
-          Data is generated and stored locally using IndexDB in a Web Worker,
-          ensuring a responsive UI and offline capabilities.
+          500,000 registers are generated and stored locally using IndexedDB in
+          a Web Worker, ensuring a responsive UI and offline capabilities.
         </p>
 
         <button
@@ -139,7 +138,7 @@ export const BarsGraphic: React.FC = () => {
           }}
           disabled={loading || !chartData?.values}
         >
-          Clear Data & IndexDB
+          Clear Data & IndexedDB
         </button>
 
         <div className="button-group">

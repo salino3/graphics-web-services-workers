@@ -145,7 +145,7 @@ self.onmessage = async (event: MessageEvent) => {
             "Worker: Data not found. Spawning parallel data generators..."
           );
           const startTime = performance.now();
-          const totalRecords = 40;
+          const totalRecords = 500_000;
           const halfRecords = totalRecords / 2;
 
           const part1Promise = new Promise<any[]>((resolve) => {
