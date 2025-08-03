@@ -39,7 +39,7 @@ export const BarsGraphic: React.FC = () => {
       );
       setCurrentChartDataType(dataType);
       setLoading(false);
-      return; // Exit early: data is already available in main thread cache
+      return;
     }
 
     // If not in cache, proceed to load from worker
@@ -49,11 +49,9 @@ export const BarsGraphic: React.FC = () => {
     setOriginalRecordCount(0);
     setCurrentChartDataType(dataType); // Update state immediately for loading message
 
-    // No need for jsonPath here, worker will generate/load from IndexDB
     if (workerRef.current) {
       workerRef.current.postMessage({
         type: "loadData",
-        // payload: jsonPath, // REMOVED: No longer fetching a static file
         dataType: dataType,
       });
     } else {
@@ -65,10 +63,12 @@ export const BarsGraphic: React.FC = () => {
 
   useEffect(() => {
     // Initialize the Web Worker only once when the component mounts
+    // and assign its event handlers.
+    // NOTE: The `{ type: 'module' }` option is crucial for the worker to handle `import.meta.url`
     const worker = new Worker(
-      new URL("../../workers/data-processor.ts", import.meta.url)
+      new URL("../../workers/data-processor.ts", import.meta.url),
+      { type: "module" }
     );
-
     workerRef.current = worker;
 
     // Listen for messages from the worker
@@ -83,21 +83,15 @@ export const BarsGraphic: React.FC = () => {
         };
         setChartData(receivedData);
         setOriginalRecordCount(receivedData.originalRecordCount);
-
-        // Cache the received processed data using the dataType returned by the worker
         setCachedProcessedData((prev) => ({
           ...prev,
-          [receivedData.dataType]: receivedData,
+          [receivedData?.dataType]: receivedData,
         }));
       } else if (event.data.type === "error") {
         setError(event.data.message);
-      } else if (event.data.type === "dataCleared") {
-        // NEW: Handle data cleared message
-        console.log("Main Thread: Data cleared successfully from worker.");
       }
     };
 
-    // Handle errors from the worker
     worker.onerror = (e) => {
       setLoading(false);
       setError(`Worker error: ${e.message}`);
@@ -111,9 +105,8 @@ export const BarsGraphic: React.FC = () => {
         workerRef.current = null;
       }
     };
-  }, []); // Empty dependency array: this effect runs only once on mount and once on unmount
+  }, []);
 
-  // Determine the chart title based on the current data type
   const chartTitle =
     currentChartDataType === "population"
       ? `Total Population per Country (Aggregated from ${originalRecordCount} persons)`
@@ -126,8 +119,8 @@ export const BarsGraphic: React.FC = () => {
       <header className="App-header">
         <h1>Country Data Visualization with Web Workers</h1>
         <p>
-          Data is generated and stored locally using IndexDB in a Web Worker,
-          ensuring a responsive UI and offline capabilities.
+          500,000 registers are generated and stored locally using IndexedDB in
+          a Web Worker, ensuring a responsive UI and offline capabilities.
         </p>
 
         <button
@@ -143,9 +136,9 @@ export const BarsGraphic: React.FC = () => {
               workerRef.current.postMessage({ type: "clearData" });
             }
           }}
-          disabled={loading}
+          disabled={loading || !chartData?.values}
         >
-          Clear Data & IndexDB
+          Clear Data & IndexedDB
         </button>
 
         <div className="button-group">
@@ -185,7 +178,9 @@ export const BarsGraphic: React.FC = () => {
       <main className="AppMain">
         {error && <p className="error-message">Error: {error}</p>}
         {loading && currentChartDataType && (
-          <p className="pLoading" style={{ color: "gold" }}>
+          <p className="pLoading">
+            {" "}
+            <span></span>
             Loading and processing data. Your UI remains responsive!{" "}
             <span></span>
           </p>
