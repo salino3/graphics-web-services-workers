@@ -17,7 +17,7 @@ if ("serviceWorker" in navigator) {
     // Register the service worker from the root of the application.
     // This ensures that the service worker has a scope that covers all pages.
     navigator.serviceWorker
-      .register("/sw.js")
+      .register(`${import.meta.env.BASE_URL}sw.js`)
       .then((registration) => {
         console.log(
           "Service Worker registered with scope:",
