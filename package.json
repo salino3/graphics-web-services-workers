@@ -10,7 +10,7 @@
     "deploy": "gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview",
-    "generate-data": "tsc -p tsconfig.generator.json --pretty --diagnostics && node ./temp-scripts-dist/large-data-generator.js"
+    "build-sw": "npm run build && node generate-sw.js"
   },
   "dependencies": {
     "chart.js": "^4.5.0",
