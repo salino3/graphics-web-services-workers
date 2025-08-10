@@ -6,7 +6,7 @@ import path from "path";
 const distDir = "dist";
 // Set the base URL prefix for your GitHub Pages project
 const BASE_URL_PREFIX = "/graphics-web-services-workers/";
-const OFFLINE_PAGE = "/graphics-web-services-workers/offline.html";
+const OFFLINE_PAGE = "/graphics-web-services-workers/404.html";
 
 // This recursive function finds all files in a directory
 async function getFiles(dir, files = []) {
