@@ -1,6 +1,6 @@
 // generate-sw.js
-const fs = require("fs");
-const path = require("path");
+import fs from "fs/promises";
+import path from "path";
 
 // Define the output folder of your project
 const distDir = "dist";
@@ -8,8 +8,9 @@ const distDir = "dist";
 const BASE_URL_PREFIX = "/graphics-web-services-workers/";
 
 // This recursive function finds all files in a directory
-function getFiles(dir, files = []) {
-  const items = fs.readdirSync(dir, { withFileTypes: true });
+// Note: Changed to async to work with fs/promises
+async function getFiles(dir, files = []) {
+  const items = await fs.readdir(dir, { withFileTypes: true });
 
   for (const item of items) {
     const itemPath = path.join(dir, item.name);
@@ -17,7 +18,7 @@ function getFiles(dir, files = []) {
       // Ignore the 'node_modules' folder and any others you don't want to cache
       if (item.name === "node_modules") continue;
       // Traverse subdirectories
-      getFiles(itemPath, files);
+      await getFiles(itemPath, files);
     } else {
       // Ignore the temporary sw.js file to avoid an infinite loop
       if (item.name === "sw.js") continue;
@@ -28,18 +29,20 @@ function getFiles(dir, files = []) {
   return files;
 }
 
-// Get the complete list of files in the 'dist' folder
-const allFiles = getFiles(distDir);
+// Main async function to handle file generation
+async function generateServiceWorker() {
+  // Get the complete list of files in the 'dist' folder
+  const allFiles = await getFiles(distDir);
 
-// Prepare the URL array for the Service Worker
-const urlsToCache = allFiles.map((file) => {
-  // Remove the 'dist/' folder from the beginning of the path
-  const relativePath = file.substring(distDir.length + 1);
-  return `${BASE_URL_PREFIX}${relativePath}`;
-});
+  // Prepare the URL array for the Service Worker
+  const urlsToCache = allFiles.map((file) => {
+    // Remove the 'dist/' folder from the beginning of the path
+    const relativePath = file.substring(distDir.length + 1);
+    return `${BASE_URL_PREFIX}${relativePath}`;
+  });
 
-// The base content of your Service Worker
-const swContent = `
+  // The base content of your Service Worker
+  const swContent = `
 const CACHE_NAME = 'my-cache-v1';
 
 // List of files to precache automatically
@@ -70,7 +73,14 @@ self.addEventListener('fetch', (event) => {
 });
 `;
 
-// Write the content to the new sw.js file inside 'dist'
-fs.writeFileSync(path.join(distDir, "sw.js"), swContent);
+  // Write the content to the new sw.js file inside 'dist'
+  try {
+    await fs.writeFile(path.join(distDir, "sw.js"), swContent);
+    console.log("sw.js successfully generated with dynamic precaching paths!");
+  } catch (error) {
+    console.error("Error writing sw.js file:", error);
+  }
+}
 
-console.log("sw.js successfully generated with dynamic precaching paths!");
+// Run the main function
+generateServiceWorker();
