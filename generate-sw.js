@@ -2,24 +2,24 @@
 const fs = require("fs");
 const path = require("path");
 
-// Define la carpeta de salida de tu proyecto
+// Define the output folder of your project
 const distDir = "dist";
-// Aquí puedes agregar un prefijo si es necesario, pero para la mayoría de los casos no lo es
-const BASE_URL_PREFIX = "/";
+// Set the base URL prefix for your GitHub Pages project
+const BASE_URL_PREFIX = "/graphics-web-services-workers/";
 
-// Esta función recursiva encuentra todos los archivos en un directorio
+// This recursive function finds all files in a directory
 function getFiles(dir, files = []) {
   const items = fs.readdirSync(dir, { withFileTypes: true });
 
   for (const item of items) {
     const itemPath = path.join(dir, item.name);
     if (item.isDirectory()) {
-      // Ignora la carpeta 'node_modules' y 'assets/icons' si es necesario
+      // Ignore the 'node_modules' folder and any others you don't want to cache
       if (item.name === "node_modules") continue;
-      // Recorre subdirectorios
+      // Traverse subdirectories
       getFiles(itemPath, files);
     } else {
-      // Ignora el archivo sw.js temporal para evitar un bucle infinito
+      // Ignore the temporary sw.js file to avoid an infinite loop
       if (item.name === "sw.js") continue;
       files.push(itemPath);
     }
@@ -28,28 +28,28 @@ function getFiles(dir, files = []) {
   return files;
 }
 
-// Obtiene la lista completa de archivos en la carpeta 'dist'
+// Get the complete list of files in the 'dist' folder
 const allFiles = getFiles(distDir);
 
-// Prepara el array de URLs para el Service Worker
+// Prepare the URL array for the Service Worker
 const urlsToCache = allFiles.map((file) => {
-  // Elimina la carpeta 'dist/' del inicio del path
+  // Remove the 'dist/' folder from the beginning of the path
   const relativePath = file.substring(distDir.length + 1);
   return `${BASE_URL_PREFIX}${relativePath}`;
 });
 
-// El contenido base de tu Service Worker
+// The base content of your Service Worker
 const swContent = `
 const CACHE_NAME = 'my-cache-v1';
 
-// Lista de archivos que se precachearán automáticamente
+// List of files to precache automatically
 const urlsToCache = ${JSON.stringify(urlsToCache, null, 2)};
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
-        console.log('Cache abierto');
+        console.log('Cache opened');
         return cache.addAll(urlsToCache);
       })
   );
@@ -59,18 +59,18 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     caches.match(event.request)
       .then((response) => {
-        // Retorna la respuesta del cache si se encuentra
+        // Return the cached response if found
         if (response) {
           return response;
         }
-        // Si no está en el cache, hace la petición a la red
+        // If not in cache, make a network request
         return fetch(event.request);
       })
   );
 });
 `;
 
-// Escribe el contenido en el nuevo archivo sw.js dentro de 'dist'
+// Write the content to the new sw.js file inside 'dist'
 fs.writeFileSync(path.join(distDir, "sw.js"), swContent);
 
-console.log("sw.js generado con éxito con las rutas de precaching dinámicas!");
+console.log("sw.js successfully generated with dynamic precaching paths!");
