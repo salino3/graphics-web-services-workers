@@ -1,6 +1,6 @@
 // generate-sw.js
-const fs = require("fs").promises;
-const path = require("path");
+import fs from "fs/promises";
+import path from "path";
 
 // Define the output folder of your project
 const distDir = "dist";
@@ -10,24 +10,20 @@ const OFFLINE_PAGE = "/graphics-web-services-workers/offline.html";
 
 // This recursive function finds all files in a directory
 async function getFiles(dir, files = []) {
-  try {
-    const items = await fs.readdir(dir, { withFileTypes: true });
+  const items = await fs.readdir(dir, { withFileTypes: true });
 
-    for (const item of items) {
-      const itemPath = path.join(dir, item.name);
-      if (item.isDirectory()) {
-        // Ignore the 'node_modules' folder and any others you don't want to cache
-        if (item.name === "node_modules") continue;
-        // Traverse subdirectories
-        await getFiles(itemPath, files);
-      } else {
-        // Ignore the temporary sw.js file to avoid an infinite loop
-        if (item.name === "sw.js") continue;
-        files.push(itemPath);
-      }
+  for (const item of items) {
+    const itemPath = path.join(dir, item.name);
+    if (item.isDirectory()) {
+      // Ignore the 'node_modules' folder and any others you don't want to cache
+      if (item.name === "node_modules") continue;
+      // Traverse subdirectories
+      await getFiles(itemPath, files);
+    } else {
+      // Ignore the temporary sw.js file to avoid an infinite loop
+      if (item.name === "sw.js") continue;
+      files.push(itemPath);
     }
-  } catch (error) {
-    console.error(`Error reading directory ${dir}:`, error);
   }
 
   return files;
