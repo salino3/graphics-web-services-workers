@@ -6,9 +6,9 @@ import path from "path";
 const distDir = "dist";
 // Set the base URL prefix for your GitHub Pages project
 const BASE_URL_PREFIX = "/graphics-web-services-workers/";
+const OFFLINE_PAGE = "/graphics-web-services-workers/offline.html";
 
 // This recursive function finds all files in a directory
-// Note: Changed to async to work with fs/promises
 async function getFiles(dir, files = []) {
   const items = await fs.readdir(dir, { withFileTypes: true });
 
@@ -44,15 +44,20 @@ async function generateServiceWorker() {
   // The base content of your Service Worker
   const swContent = `
 const CACHE_NAME = 'my-cache-v1';
+const OFFLINE_URL = '${OFFLINE_PAGE}';
 
 // List of files to precache automatically
-const urlsToCache = ${JSON.stringify(urlsToCache, null, 2)};
+const urlsToCache = [
+  ...${JSON.stringify(urlsToCache, null, 2)},
+  OFFLINE_URL
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
         console.log('Cache opened');
+        // Add all static assets and the offline page to the cache
         return cache.addAll(urlsToCache);
       })
   );
@@ -60,14 +65,24 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
+    // Try to find the resource in the cache first
     caches.match(event.request)
-      .then((response) => {
-        // Return the cached response if found
-        if (response) {
+    .then((response) => {
+      console.log('Caches', caches);
+      // If the resource is in the cache, return it
+      if (response) {
           return response;
         }
-        // If not in cache, make a network request
-        return fetch(event.request);
+
+        // If not in cache, try to fetch it from the network
+        return fetch(event.request)
+          .catch(() => {
+            // If the network request fails (because we're offline),
+            // and the request is for a navigation, serve the offline page.
+            if (event.request.mode === 'navigate') {
+              return caches.match(OFFLINE_URL);
+            }
+          });
       })
   );
 });
