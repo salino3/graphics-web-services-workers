@@ -1,6 +1,6 @@
 
 const CACHE_NAME = 'my-cache-v1';
-const OFFLINE_URL = '/graphics-web-services-workers/offline.html';
+const OFFLINE_URL = '/graphics-web-services-workers/404.html';
 
 // List of files to precache automatically
 const urlsToCache = [
