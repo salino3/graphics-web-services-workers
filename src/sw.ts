@@ -1,71 +1,79 @@
-// For deploy service workers
 //  npm install --save-dev rollup-plugin-copy
+/// <reference lib="webworker" />
+// eslint-disable-next-line no-restricted-globals
+const self = globalThis as unknown as ServiceWorkerGlobalScope;
 
 const CACHE_NAME = "vite-react-cache-v1";
 
-// A list of all files that we want to pre-cache
-// This list is essential for offline functionality.
-// Vite automatically generates a manifest file (manifest.json)
-// which we can use to get a list of all our production assets.
+// We define the base URL prefix for GitHub Pages.
+// This allows us to build the correct paths.
+const BASE_URL_PREFIX = "/graphics-web-services-workers/";
+
+// List of all files we want to pre-cache.
+// Important! Paths must be absolute from the domain root
+// so the Service Worker can find them correctly.
+// For example, for a file at /graphics-web-services-workers/index.html, the full path is needed.
 const urlsToCache = [
-  "/", // The main HTML page
-  "/index.html",
-  "/404.html",
-  "/assets/index.css",
-  "/assets/index.js",
-  "/assets/icons/section_01/F_icon.svg",
+  // If the base path is '/graphics-web-services-workers/'
+  // then the path to index.html is '/graphics-web-services-workers/index.html'
+  `${BASE_URL_PREFIX}`,
+  `${BASE_URL_PREFIX}index.html`,
+  `${BASE_URL_PREFIX}main-08D0_r0jS.js`, // This filename may change
+  `${BASE_URL_PREFIX}main-C6S5-jkS5.css`, // This filename may change
+  `${BASE_URL_PREFIX}F_icon.svg`,
 ];
 
-// Event listener for the 'install' event
-// This is triggered when the browser installs the Service Worker.
-// We use this event to pre-populate our cache with the assets needed
-// for the application to work offline.
-self.addEventListener("install", (event: any) => {
-  console.log("Service Worker installing...");
+self.addEventListener("install", (event) => {
+  console.log("Service Worker: Install event.");
+  // The install event is fired when the Service Worker is registered.
+  // We extend the event to wait until pre-caching is complete.
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      console.log("Opened cache, pre-caching assets");
-      return cache.addAll(urlsToCache);
-    })
-  );
-});
-
-// Event listener for the 'fetch' event
-// This is triggered every time the browser makes a network request.
-// We intercept these requests and try to serve the response from our cache first.
-// This is a "cache-first" strategy, which is great for performance and offline support.
-self.addEventListener("fetch", (event: any) => {
-  event.respondWith(
-    caches.match(event.request).then((response) => {
-      // If the resource is in the cache, we return it.
-      if (response) {
-        console.log(`Serving from cache: ${event.request.url}`);
-        return response;
+    // We open a cache with the name CACHE_NAME.
+    caches.open(CACHE_NAME).then(async (cache) => {
+      console.log("Service Worker: Pre-caching resources.");
+      // We add all files from the list to the cache.
+      try {
+        return await cache.addAll(urlsToCache);
+      } catch (error) {
+        console.error("Service Worker: Error during pre-caching.", error);
       }
-
-      // If the resource is not in the cache, we fetch it from the network.
-      console.log(`Fetching from network: ${event.request.url}`);
-      return fetch(event.request);
     })
   );
 });
 
-// Event listener for the 'activate' event
-// This is triggered when the Service Worker is activated.
-// We use this event to clean up old caches to save space.
-self.addEventListener("activate", (event: any) => {
-  console.log("Service Worker activating...");
-  console.log("CACHES:", caches);
+self.addEventListener("activate", (event) => {
+  console.log("Service Worker: Activate event.");
+  // We extend the event to clean up any old caches.
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
+          console.log("CACHES:", caches);
+          // If the cache name is different from the current one, we delete it.
           if (cacheName !== CACHE_NAME) {
-            console.log(`Deleting old cache: ${cacheName}`);
+            console.log("Service Worker: Clearing old cache:", cacheName);
             return caches.delete(cacheName);
           }
         })
       );
+    })
+  );
+});
+
+self.addEventListener("fetch", (event) => {
+  console.log("Service Worker: Fetch event for:", event.request.url);
+  // We intercept the requests.
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      // If the response is in the cache, we return it.
+      if (response) {
+        return response;
+      }
+      // Otherwise, we make a request to the network.
+      console.log(
+        "Service Worker: Resource not found in cache, fetching from network."
+      );
+      return fetch(event.request);
     })
   );
 });
