@@ -8,7 +8,7 @@
     "dev": "vite --port 4100",
     "build": "tsc -b && vite build",
     "build-sw": "npm run build && node generate-sw.js",
-    "predeploy": "npm run build-sw",
+    "predeploy": "npm run build-sw && cp dist/index.html dist/404.html",
     "deploy": "gh-pages -d dist",
     "lint": "eslint .",
     "preview": "vite preview"
