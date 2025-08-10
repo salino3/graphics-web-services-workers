@@ -18,9 +18,10 @@ const urlsToCache = [
   // then the path to index.html is '/graphics-web-services-workers/index.html'
   `${BASE_URL_PREFIX}`,
   `${BASE_URL_PREFIX}index.html`,
-  `${BASE_URL_PREFIX}main-08D0_r0jS.js`, // This filename may change
-  `${BASE_URL_PREFIX}main-C6S5-jkS5.css`, // This filename may change
-  `${BASE_URL_PREFIX}F_icon.svg`,
+  `${BASE_URL_PREFIX}404.html`,
+  `${BASE_URL_PREFIX}index.css`,
+  `${BASE_URL_PREFIX}index.js`,
+  `${BASE_URL_PREFIX}assets/icons/F_icon.svg`,
 ];
 
 self.addEventListener("install", (event) => {
