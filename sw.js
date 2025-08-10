@@ -31,21 +31,20 @@ self.addEventListener('fetch', (event) => {
     // Try to find the resource in the cache first
     caches.match(event.request)
     .then((response) => {
-      console.log('Caches', caches);
       // If the resource is in the cache, return it
       if (response) {
           return response;
         }
 
-        // If not in cache, try to fetch it from the network
-        return fetch(event.request)
-          .catch(() => {
-            // If the network request fails (because we're offline),
-            // and the request is for a navigation, serve the offline page.
-            if (event.request.mode === 'navigate') {
-              return caches.match(OFFLINE_URL);
-            }
-          });
-      })
+      // If not in cache, try to fetch it from the network
+      return fetch(event.request)
+        .catch(() => {
+          // If the network request fails (because we're offline),
+          // and the request is for a navigation, serve the offline page.
+          if (event.request.mode === 'navigate') {
+            return caches.match(OFFLINE_URL);
+          }
+        });
+    })
   );
 });
