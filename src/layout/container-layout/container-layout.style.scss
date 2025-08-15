@@ -23,13 +23,20 @@
     opacity: 0;
     transform: translateY(-10px);
     transition: opacity 1s ease-in-out, transform 1s ease-in-out;
-    background-color: rgb(128, 128, 128, 0.5);
+    background-color: rgb(92, 92, 92);
     padding: 1rem;
     border-radius: 0.5rem;
+    border: solid 2px;
 
     &.show {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    .lineIcon {
+      position: absolute;
+      right: 1rem;
+      // transform: translate(0%, 0%);
     }
   }
 }

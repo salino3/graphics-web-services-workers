@@ -31,11 +31,24 @@ export const ContainerLayout: React.FC<Props> = ({ children }) => {
     };
   }, []);
 
-  console.log("onLine", navigator.onLine);
-
   return (
     <div className="rootContainerLayout">
-      <span className={`popupOnLine ${visible ? "show" : ""}`}>{isOnline}</span>
+      <span className={`popupOnLine ${visible ? "show" : ""}`}>
+        {isOnline}🛜{" "}
+        {!navigator.onLine && (
+          <svg width="22" height="24" viewBox="0 0 64 64" className="lineIcon">
+            <line
+              x1="16"
+              y1="16"
+              x2="48"
+              y2="48"
+              stroke="#f44336"
+              strokeWidth="9"
+              strokeLinecap="round"
+            />
+          </svg>
+        )}
+      </span>
       {children}
     </div>
   );
