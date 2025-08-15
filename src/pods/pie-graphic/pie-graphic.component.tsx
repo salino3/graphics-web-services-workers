@@ -14,9 +14,9 @@ export const PieGrafic: React.FC = () => {
   const [originalRecordCount, setOriginalRecordCount] = useState<number>(0);
 
   // State to cache processed chart data for each type
-  const [cachedProcessedData, setCachedProcessedData] = useState<
-    Partial<ProcessedChartData>
-  >({});
+  //   const [cachedProcessedData, setCachedProcessedData] = useState<
+  //     Partial<ProcessedChartData>
+  //   >({});
 
   const workerRef = useRef<Worker | null>(null);
 
