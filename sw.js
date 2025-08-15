@@ -8,8 +8,8 @@ const urlsToCache = [
   "/graphics-web-services-workers/assets\\data-generator-Bh-7_DMJ.js",
   "/graphics-web-services-workers/assets\\data-processor-BR-WKZpl.js",
   "/graphics-web-services-workers/assets\\icons\\section_01\\F_icon.svg",
-  "/graphics-web-services-workers/assets\\index-Cds55-jX.css",
-  "/graphics-web-services-workers/assets\\index-VSuqAebQ.js",
+  "/graphics-web-services-workers/assets\\index-BxTlHiV4.css",
+  "/graphics-web-services-workers/assets\\index-CFXrDuL5.js",
   "/graphics-web-services-workers/index.html"
 ],
   OFFLINE_URL
