@@ -11,7 +11,7 @@ export const HomePage: React.FC = () => {
         press in the graphics are you interesting for read the data
       </p>
       <div className={`centerRow btnPrimary_01 ${styles.containerAnchors}`}>
-        <Link to={""}>Pie Charts</Link>
+        <Link to={routesApp?.pie_graphic}>Pie Charts</Link>
         <Link to={routesApp?.bars_graphic}>Bars Charts</Link>
       </div>
     </div>

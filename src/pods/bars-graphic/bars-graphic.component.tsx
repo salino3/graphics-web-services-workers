@@ -115,8 +115,8 @@ export const BarsGraphic: React.FC = () => {
       : `Percentage of Total Pets per Country (Aggregated from ${originalRecordCount} persons)`;
 
   return (
-    <div className="AppContainer">
-      <header className="App-header">
+    <div className="rootBarsGraphic">
+      <header className="AppHeader">
         <h1>Country Data Visualization with Web Workers</h1>
         <p>
           500,000 registers are generated and stored locally using IndexedDB in
