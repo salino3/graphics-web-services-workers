@@ -6,12 +6,27 @@
   min-height: 100dvh;
   min-width: 100%;
   position: relative;
-
+  z-index: 1;
   overflow: scroll;
   -ms-overflow-style: none; // IE 10+
   scrollbar-width: none; // Firefox
 
   &::-webkit-scrollbar {
     display: none; // Chrome, Safari, Opera
+  }
+
+  .popupOnLine {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10;
+    opacity: 0; // Start invisible
+    transform: translateY(-10px); // Slightly above
+    transition: opacity 1s ease-in-out, transform 1s ease-in-out;
+
+    &.show {
+      opacity: 1; // Fade in
+      transform: translateY(0); // Move to position
+    }
   }
 }
