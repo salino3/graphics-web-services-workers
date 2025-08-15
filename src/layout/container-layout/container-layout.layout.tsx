@@ -35,11 +35,7 @@ export const ContainerLayout: React.FC<Props> = ({ children }) => {
 
   return (
     <div className="rootContainerLayout">
-      {isOnline && (
-        <span className={`popupOnLine ${visible ? "show" : ""}`}>
-          {isOnline}
-        </span>
-      )}
+      <span className={`popupOnLine ${visible ? "show" : ""}`}>{isOnline}</span>
       {children}
     </div>
   );
