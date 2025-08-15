@@ -81,7 +81,7 @@ export const PieGrafic: React.FC = () => {
     };
   }, []);
 
-  console.log("chartData", chartData);
+  console.log("chartData", chartData, originalRecordCount, error, loading);
   return (
     <div className="rootPieGrafic">
       <button onClick={() => loadDataWithWorker()}>Click me</button>
