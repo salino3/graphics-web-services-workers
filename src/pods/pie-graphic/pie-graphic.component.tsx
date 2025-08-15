@@ -20,12 +20,32 @@ export const PieGrafic: React.FC = () => {
 
   const workerRef = useRef<Worker | null>(null);
 
+  // Function to send a message to the worker to load and process data
+  const loadDataWithWorker = () => {
+    // If not in cache, proceed to load from worker
+    setLoading(true);
+    setError(null);
+    setChartData(null); // Clear previous chart data to show loading state
+    setOriginalRecordCount(0);
+
+    if (workerRef.current) {
+      workerRef.current.postMessage({
+        type: "loadData",
+      });
+    } else {
+      console.error("Worker not initialized when trying to load data.");
+      setError("Worker not ready. Please refresh the page.");
+      setLoading(false);
+    }
+  };
+
+  //
   useEffect(() => {
     // Initialize the Web Worker only once when the component mounts
     // and assign its event handlers.
     // NOTE: The `{ type: 'module' }` option is crucial for the worker to handle `import.meta.url`
     const worker = new Worker(
-      new URL("../../workers/data-processor-pie.ts", import.meta.url),
+      new URL("../../workers/pie/data-processor-pie.ts", import.meta.url),
       { type: "module" }
     );
     workerRef.current = worker;
@@ -62,5 +82,9 @@ export const PieGrafic: React.FC = () => {
   }, []);
 
   console.log("chartData", chartData);
-  return <div className="rootPieGrafic"></div>;
+  return (
+    <div className="rootPieGrafic">
+      <button onClick={() => loadDataWithWorker()}>Click me</button>
+    </div>
+  );
 };

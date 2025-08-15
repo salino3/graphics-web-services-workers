@@ -66,7 +66,7 @@ export const BarsGraphic: React.FC = () => {
     // and assign its event handlers.
     // NOTE: The `{ type: 'module' }` option is crucial for the worker to handle `import.meta.url`
     const worker = new Worker(
-      new URL("../../workers/data-processor.ts", import.meta.url),
+      new URL("../../workers/bars/data-processor.ts", import.meta.url),
       { type: "module" }
     );
     workerRef.current = worker;

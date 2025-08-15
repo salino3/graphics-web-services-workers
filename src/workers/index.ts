@@ -1,1 +1,1 @@
-export * from "./data-processor";
+export * from "./bars/data-processor";
