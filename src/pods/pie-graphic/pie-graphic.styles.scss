@@ -1,8 +1,87 @@
 .rootPieGraphic {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
   padding: 20px;
   width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-  overflow-x: auto;
+  gap: 2rem;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.button-container {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.action-button {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+  background-color: #3498db;
+}
+
+.action-button:hover {
+  transform: translateY(-2px);
+  background-color: #2980b9;
+}
+
+.action-button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+.containerPie {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* Contenedor del gráfico más grande */
+.chart-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  height: 400px;
+}
+
+/* Estilo para la leyenda generada por Chart.js */
+.chartjs-legend ul {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.status-text {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.error-text {
+  color: #e74c3c;
+}
+
+.record-count span {
+  font-weight: bold;
+  color: #3498db;
 }

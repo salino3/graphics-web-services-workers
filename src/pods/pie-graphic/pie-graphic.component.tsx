@@ -88,19 +88,6 @@ export const PieGraphic: React.FC = () => {
     };
   }, []);
 
-  // Define colors for the chart slices
-  const COLORS = [
-    "#FF6384",
-    "#36A2EB",
-    "#FFCE56",
-    "#4BC0C0",
-    "#9966FF",
-    "#FF9F40",
-    "#B0E0E6",
-    "#8A2BE2",
-    "#DA70D6",
-  ];
-
   // Data structure required by react-chartjs-2, derived from chartData state
   const data = chartData
     ? {
@@ -140,37 +127,46 @@ export const PieGraphic: React.FC = () => {
     },
   };
 
-  console.log("chartData", chartData, originalRecordCount, error, loading);
+  console.log("chartData", chartData, originalRecordCount);
   return (
     <div className="rootPieGraphic">
-      <button onClick={() => loadDataWithWorker()}>Click me</button>
-
-      <div className="containerPie">
-        {loading && (
-          <p className="text-xl text-gray-500 animate-pulse">Loading data...</p>
-        )}
-        {error && <p className="text-red-500">Error: {error}</p>}
-        {chartData && data ? (
-          <>
-            <div className="relative h-[400px]">
-              <Pie data={data} options={options} />
-            </div>
-            <p className="text-center text-gray-600 mt-6">
-              Visualizando un total de{" "}
-              <span className="font-semibold">
-                {originalRecordCount.toLocaleString()}
-              </span>{" "}
-              registros.
-            </p>
-          </>
-        ) : (
+      <div className="rootPieGraphic">
+        <div className="button-container">
           <button
             onClick={loadDataWithWorker}
-            className="mt-4 px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+            className="action-button"
+            disabled={loading}
           >
-            Load Data
+            {loading ? "Loading..." : "Load data"}
           </button>
-        )}
+          {chartData && (
+            <button
+              // onClick={clearData}
+              className="action-button"
+              style={{ backgroundColor: "#e67e22" }}
+            >
+              Delete data
+            </button>
+          )}
+        </div>
+
+        <div className="containerPie">
+          {loading && <p className="status-text">Loading data...</p>}
+          {error && <p className="status-text error-text">Error: {error}</p>}
+          {chartData && data ? (
+            <>
+              <div className="chart-wrapper">
+                <Pie data={data} options={options} />
+              </div>
+              <p className="status-text record-count">
+                Showing a total of{" "}
+                <span>{originalRecordCount.toLocaleString()}</span> records.
+              </p>
+            </>
+          ) : (
+            <p className="status-text">Click "Load Data" to view the graph.</p>
+          )}
+        </div>
       </div>
     </div>
   );
