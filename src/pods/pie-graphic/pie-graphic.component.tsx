@@ -7,7 +7,7 @@ interface ProcessedChartData {
   originalRecordCount: number;
 }
 
-export const PieGrafic: React.FC = () => {
+export const PieGraphic: React.FC = () => {
   const [chartData, setChartData] = useState<ProcessedChartData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,7 +83,7 @@ export const PieGrafic: React.FC = () => {
 
   console.log("chartData", chartData, originalRecordCount, error, loading);
   return (
-    <div className="rootPieGrafic">
+    <div className="rootPieGraphic">
       <button onClick={() => loadDataWithWorker()}>Click me</button>
     </div>
   );
