@@ -9,6 +9,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 interface ProcessedChartData {
   labels: string[];
   values: number[];
+  colors: string[];
   originalRecordCount: number;
 }
 
@@ -62,6 +63,7 @@ export const PieGraphic: React.FC = () => {
         const receivedData: ProcessedChartData = {
           labels: event.data.labels,
           values: event.data.values,
+          colors: event.data.colors,
           originalRecordCount: event.data.originalRecordCount,
         };
         setChartData(receivedData);
@@ -107,7 +109,7 @@ export const PieGraphic: React.FC = () => {
           {
             label: "# of Records",
             data: chartData.values,
-            backgroundColor: COLORS,
+            backgroundColor: chartData.colors,
             borderColor: "#ffffff",
             borderWidth: 2,
           },
