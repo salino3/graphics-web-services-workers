@@ -41,46 +41,30 @@
         font-size: 0.9rem;
       }
     }
-  }
 
-  .containerDown {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    padding: 20px;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-    gap: 1rem;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    box-sizing: border-box;
     .buttonContainer {
       display: flex;
       gap: 1rem;
-      margin-bottom: 1rem;
 
       .actionButton {
         padding: 12px 24px;
         font-size: 16px;
         font-weight: bold;
-        color: #fff;
+        color: #282c34;
         border: none;
         border-radius: 8px;
         cursor: pointer;
         transition: background-color 0.3s ease, transform 0.1s ease;
-        background-color: #3498db;
+        background-color: #61dafb;
       }
 
-      .actionButton:hover {
+      .actionButton:hover:not(:disabled) {
         transform: translateY(-2px);
-        background-color: #2980b9;
+        background-color: #21a1f1;
       }
 
       .actionButton:disabled {
-        background-color: #bdc3c7;
+        background-color: #cccccc;
         cursor: not-allowed;
       }
 
@@ -117,6 +101,22 @@
         }
       }
     }
+  }
+
+  .containerDown {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    gap: 1rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
 
     .containerPie {
       display: flex;
@@ -144,6 +144,37 @@
       gap: 10px;
       padding: 0;
       margin-top: 1rem;
+    }
+
+    .pLoading {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      color: orange;
+      font-size: 1.1rem;
+      @media (max-width: 480px) {
+        font-size: 0.9rem;
+      }
+
+      span {
+        padding: 1rem;
+        min-width: 1rem;
+        max-width: 1rem;
+        min-height: 1rem;
+        max-height: 1rem;
+        border-radius: 50%;
+        // Estilos para el efecto de carga: un borde que gira
+        border: solid 2px rgba(255, 255, 255, 0.2); // Borde transparente o semi-transparente
+        border-top-color: gold; // Color sólido en la parte superior para el efecto de movimiento
+        box-shadow: 0 0 5px gold; // Sombra para un efecto de resplandor
+        animation: spin 1s linear infinite; // Aplica la animación 'spin'
+
+        @media (prefers-reduced-motion) {
+          animation: none;
+        }
+      }
     }
 
     .status-text {

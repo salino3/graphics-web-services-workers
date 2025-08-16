@@ -132,8 +132,6 @@ export const PieGraphic: React.FC = () => {
           stored locally using IndexedDB in a Web Worker, ensuring a responsive
           UI and offline capabilities.
         </p>
-      </div>
-      <div className="containerDown">
         <div className="buttonContainer">
           <button
             onClick={loadDataWithWorker}
@@ -158,9 +156,17 @@ export const PieGraphic: React.FC = () => {
             Clear Data & IndexedDB
           </button>
         </div>
-
+      </div>
+      <div className="containerDown">
         <div className="containerPie">
-          {loading && <p className="status-text">Loading data...</p>}
+          {loading && (
+            <p className="pLoading">
+              {" "}
+              <span></span>
+              Loading and processing data. Your UI remains responsive!{" "}
+              <span></span>
+            </p>
+          )}
           {error && <p className="status-text error-text">Error: {error}</p>}
           {chartData && data ? (
             <>
