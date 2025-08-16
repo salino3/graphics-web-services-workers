@@ -59,14 +59,33 @@
         background-color: #61dafb;
       }
 
-      .actionButton:hover:not(:disabled) {
+      .actionButton:active {
+        opacity: 0.7;
+      }
+
+      .actionButton:hover {
         transform: translateY(-2px);
-        background-color: #21a1f1;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4),
+          -2px -2px 10px rgba(0, 0, 0, 0.4);
+      }
+
+      .actionButton:hover:not(:disabled) {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
       }
 
       .actionButton:disabled {
         background-color: #cccccc;
         cursor: not-allowed;
+        transform: translateY(0);
+        opacity: 0.7;
+
+        &:disabled:active {
+          scale: 1;
+        }
+      }
+
+      .actionButton:disabled:active {
+        scale: 1;
       }
 
       .clear {
@@ -99,6 +118,12 @@
           background-color: #cccccc;
           cursor: not-allowed;
           opacity: 0.7;
+          // pointer-events: none;
+          transform: translateY(0);
+        }
+
+        &:disabled:active {
+          scale: 1;
         }
       }
     }
