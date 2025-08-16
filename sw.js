@@ -6,12 +6,12 @@ const OFFLINE_URL = '/graphics-web-services-workers/404.html';
 const urlsToCache = [
   ...[
   "/graphics-web-services-workers/assets\\data-generator-Bh-7_DMJ.js",
-  "/graphics-web-services-workers/assets\\data-generator-pie-BhxYFx_Z.js",
+  "/graphics-web-services-workers/assets\\data-generator-pie-DJVU62Af.js",
   "/graphics-web-services-workers/assets\\data-processor-BR-WKZpl.js",
-  "/graphics-web-services-workers/assets\\data-processor-pie--msDYhjH.js",
+  "/graphics-web-services-workers/assets\\data-processor-pie-sQRQcvNv.js",
   "/graphics-web-services-workers/assets\\icons\\section_01\\F_icon.svg",
-  "/graphics-web-services-workers/assets\\index-By_V14Zu.js",
-  "/graphics-web-services-workers/assets\\index-FR--ngjn.css",
+  "/graphics-web-services-workers/assets\\index-Ce6tKWDY.js",
+  "/graphics-web-services-workers/assets\\index-CPIQnjW3.css",
   "/graphics-web-services-workers/index.html"
 ],
   OFFLINE_URL
