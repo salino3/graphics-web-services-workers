@@ -105,7 +105,7 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
       x: {
         title: {
           display: true,
-          text: "Country",
+          text: "Countries",
         },
       },
       y: {

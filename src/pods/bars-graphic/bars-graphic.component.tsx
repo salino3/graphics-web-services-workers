@@ -109,18 +109,19 @@ export const BarsGraphic: React.FC = () => {
 
   const chartTitle =
     currentChartDataType === "population"
-      ? `Total Population per Country (Aggregated from ${originalRecordCount} persons)`
+      ? `Total Population per Country (Aggregated from ${originalRecordCount.toLocaleString()} persons)`
       : currentChartDataType === "pets"
-      ? `Total Pets per Country (Aggregated from ${originalRecordCount} persons)`
-      : `Percentage of Total Pets per Country (Aggregated from ${originalRecordCount} persons)`;
+      ? `Total Pets per Country (Aggregated from ${originalRecordCount.toLocaleString()} persons)`
+      : `Percentage of Total Pets per Country (Aggregated from ${originalRecordCount.toLocaleString()} persons)`;
 
   return (
     <div className="rootBarsGraphic">
       <header className="AppHeader">
         <h1>Country Data Visualization with Web Workers</h1>
         <p>
-          500,000 registers are generated and stored locally using IndexedDB in
-          a Web Worker, ensuring a responsive UI and offline capabilities.
+          {originalRecordCount.toLocaleString()} registers are generated and
+          stored locally using IndexedDB in a Web Worker, ensuring a responsive
+          UI and offline capabilities.
         </p>
 
         <button

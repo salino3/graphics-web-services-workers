@@ -125,47 +125,59 @@ export const PieGraphic: React.FC = () => {
   console.log("chartData", chartData, originalRecordCount);
   return (
     <div className="rootPieGraphic">
-      <div className="buttonContainer">
-        <button
-          onClick={loadDataWithWorker}
-          className="actionButton"
-          disabled={loading || !!chartData?.values}
-        >
-          {loading ? "Loading..." : "Load data"}
-        </button>
-        <button
-          className="clear"
-          onClick={() => {
-            setChartData(null);
-            setError(null);
-            setLoading(false);
-            // NEW: Send message to worker to clear IndexDB
-            if (workerRef.current) {
-              workerRef.current.postMessage({ type: "clearData" });
-            }
-          }}
-          disabled={loading || !chartData?.values}
-        >
-          Clear Data & IndexedDB
-        </button>
+      <div className="containerUp">
+        <h1>Country Data Visualization with Web Workers</h1>
+        <p>
+          {originalRecordCount.toLocaleString()} registers are generated and
+          stored locally using IndexedDB in a Web Worker, ensuring a responsive
+          UI and offline capabilities.
+        </p>
       </div>
+      <div className="containerDown">
+        <div className="buttonContainer">
+          <button
+            onClick={loadDataWithWorker}
+            className="actionButton"
+            disabled={loading || !!chartData?.values}
+          >
+            {loading ? "Loading..." : "Load data"}
+          </button>
+          <button
+            className="clear"
+            onClick={() => {
+              setChartData(null);
+              setError(null);
+              setLoading(false);
+              // NEW: Send message to worker to clear IndexDB
+              if (workerRef.current) {
+                workerRef.current.postMessage({ type: "clearData" });
+              }
+            }}
+            disabled={loading || !chartData?.values}
+          >
+            Clear Data & IndexedDB
+          </button>
+        </div>
 
-      <div className="containerPie">
-        {loading && <p className="status-text">Loading data...</p>}
-        {error && <p className="status-text error-text">Error: {error}</p>}
-        {chartData && data ? (
-          <>
-            <div className="chart-wrapper">
-              <Pie data={data} options={options} />
-            </div>
-            <p className="status-text record-count">
-              Showing a total of{" "}
-              <span>{originalRecordCount.toLocaleString()}</span> records.
+        <div className="containerPie">
+          {loading && <p className="status-text">Loading data...</p>}
+          {error && <p className="status-text error-text">Error: {error}</p>}
+          {chartData && data ? (
+            <>
+              <div className="chart-wrapper">
+                <Pie data={data} options={options} />
+              </div>
+              <p className="status-text record-count">
+                Showing a total of{" "}
+                <span>{originalRecordCount.toLocaleString()}</span> records.
+              </p>
+            </>
+          ) : (
+            <p className="status-text">
+              Click "Load Data" to view the graphic.
             </p>
-          </>
-        ) : (
-          <p className="status-text">Click "Load Data" to view the graphic.</p>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
