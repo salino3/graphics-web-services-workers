@@ -161,10 +161,9 @@ export const PieGraphic: React.FC = () => {
         <div className="containerPie">
           {loading && (
             <p className="pLoading">
-              {" "}
-              <span></span>
+              <div></div>
               Loading and processing data. Your UI remains responsive!{" "}
-              <span></span>
+              <div></div>
             </p>
           )}
           {error && <p className="status-text error-text">Error: {error}</p>}

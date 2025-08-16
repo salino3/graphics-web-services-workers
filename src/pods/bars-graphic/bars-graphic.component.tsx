@@ -180,10 +180,8 @@ export const BarsGraphic: React.FC = () => {
         {error && <p className="error-message">Error: {error}</p>}
         {loading && currentChartDataType && (
           <p className="pLoading">
-            {" "}
-            <span></span>
-            Loading and processing data. Your UI remains responsive!{" "}
-            <span></span>
+            <div></div>
+            Loading and processing data. Your UI remains responsive! <div></div>
           </p>
         )}
         {chartData && currentChartDataType && (
