@@ -1,5 +1,10 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Pie } from "react-chartjs-2";
 import "./pie-graphic.styles.scss";
+
+// Register the required components from Chart.js
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface ProcessedChartData {
   labels: string[];
@@ -81,10 +86,90 @@ export const PieGraphic: React.FC = () => {
     };
   }, []);
 
+  // Define colors for the chart slices
+  const COLORS = [
+    "#FF6384",
+    "#36A2EB",
+    "#FFCE56",
+    "#4BC0C0",
+    "#9966FF",
+    "#FF9F40",
+    "#B0E0E6",
+    "#8A2BE2",
+    "#DA70D6",
+  ];
+
+  // Data structure required by react-chartjs-2, derived from chartData state
+  const data = chartData
+    ? {
+        labels: chartData.labels,
+        datasets: [
+          {
+            label: "# of Records",
+            data: chartData.values,
+            backgroundColor: COLORS,
+            borderColor: "#ffffff",
+            borderWidth: 2,
+          },
+        ],
+      }
+    : null;
+
+  // Options for the chart
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top" as const,
+      },
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            const label = tooltipItem.label || "";
+            const value = tooltipItem.raw;
+            const total =
+              chartData?.values.reduce((sum, val) => sum + val, 0) || 1;
+            const percentage = ((value / total) * 100).toFixed(2);
+            return `${label}: ${value} (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
   console.log("chartData", chartData, originalRecordCount, error, loading);
   return (
     <div className="rootPieGraphic">
       <button onClick={() => loadDataWithWorker()}>Click me</button>
+
+      <div className="containerPie">
+        {loading && (
+          <p className="text-xl text-gray-500 animate-pulse">Loading data...</p>
+        )}
+        {error && <p className="text-red-500">Error: {error}</p>}
+        {chartData && data ? (
+          <>
+            <div className="relative h-[400px]">
+              <Pie data={data} options={options} />
+            </div>
+            <p className="text-center text-gray-600 mt-6">
+              Visualizando un total de{" "}
+              <span className="font-semibold">
+                {originalRecordCount.toLocaleString()}
+              </span>{" "}
+              registros.
+            </p>
+          </>
+        ) : (
+          <button
+            onClick={loadDataWithWorker}
+            className="mt-4 px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-600 transition-colors"
+          >
+            Load Data
+          </button>
+        )}
+      </div>
     </div>
   );
 };
