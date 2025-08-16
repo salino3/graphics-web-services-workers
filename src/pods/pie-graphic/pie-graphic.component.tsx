@@ -1,22 +1,23 @@
 import React, { useEffect, useRef, useState } from "react";
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import { Pie } from "react-chartjs-2";
 import "./pie-graphic.styles.scss";
+
+// Register the required components from Chart.js
+ChartJS.register(ArcElement, Tooltip, Legend);
 
 interface ProcessedChartData {
   labels: string[];
   values: number[];
+  colors: string[];
   originalRecordCount: number;
 }
 
-export const PieGrafic: React.FC = () => {
+export const PieGraphic: React.FC = () => {
   const [chartData, setChartData] = useState<ProcessedChartData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [originalRecordCount, setOriginalRecordCount] = useState<number>(0);
-
-  // State to cache processed chart data for each type
-  //   const [cachedProcessedData, setCachedProcessedData] = useState<
-  //     Partial<ProcessedChartData>
-  //   >({});
 
   const workerRef = useRef<Worker | null>(null);
 
@@ -57,6 +58,7 @@ export const PieGrafic: React.FC = () => {
         const receivedData: ProcessedChartData = {
           labels: event.data.labels,
           values: event.data.values,
+          colors: event.data.colors,
           originalRecordCount: event.data.originalRecordCount,
         };
         setChartData(receivedData);
@@ -81,10 +83,107 @@ export const PieGrafic: React.FC = () => {
     };
   }, []);
 
-  console.log("chartData", chartData, originalRecordCount, error, loading);
+  // Data structure required by react-chartjs-2, derived from chartData state
+  const data = chartData
+    ? {
+        labels: chartData.labels,
+        datasets: [
+          {
+            label: "# of Records",
+            data: chartData.values,
+            backgroundColor: chartData.colors,
+            borderColor: "#ffffff",
+            borderWidth: 2,
+          },
+        ],
+      }
+    : null;
+
+  // Options for the chart
+  const options = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: "top" as const,
+      },
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            const label = tooltipItem.label || "";
+            const value = tooltipItem.raw;
+            const total =
+              chartData?.values.reduce((sum, val) => sum + val, 0) || 1;
+            const percentage = ((value / total) * 100).toFixed(2);
+            return ` ${label}: ${value} (${percentage}%)`;
+          },
+        },
+      },
+    },
+  };
+
+  console.log("chartData", chartData, originalRecordCount);
   return (
-    <div className="rootPieGrafic">
-      <button onClick={() => loadDataWithWorker()}>Click me</button>
+    <div className="rootPieGraphic">
+      <div className="containerUp">
+        <h1>Country Data Visualization with Web Workers</h1>
+        <p>
+          {originalRecordCount.toLocaleString()} registers are generated and
+          stored locally using IndexedDB in a Web Worker, ensuring a responsive
+          UI and offline capabilities.
+        </p>
+        <div className="buttonContainer">
+          <button
+            onClick={loadDataWithWorker}
+            className="actionButton"
+            disabled={loading || !!chartData?.values}
+          >
+            {loading ? "Loading..." : "Load data"}
+          </button>
+          <button
+            className="clear"
+            onClick={() => {
+              setChartData(null);
+              setError(null);
+              setLoading(false);
+              // NEW: Send message to worker to clear IndexDB
+              if (workerRef.current) {
+                workerRef.current.postMessage({ type: "clearData" });
+              }
+            }}
+            disabled={loading || !chartData?.values}
+          >
+            Clear Data & IndexedDB
+          </button>
+        </div>
+      </div>
+      <div className="containerDown">
+        <div className="containerPie">
+          {loading && (
+            <p className="pLoading">
+              <div></div>
+              Loading and processing data. Your UI remains responsive!{" "}
+              <div></div>
+            </p>
+          )}
+          {error && <p className="status-text error-text">Error: {error}</p>}
+          {chartData && data ? (
+            <>
+              <div className="chart-wrapper">
+                <Pie data={data} options={options} />
+              </div>
+              <p className="status-text record-count">
+                Showing a total of{" "}
+                <span>{originalRecordCount.toLocaleString()}</span> records.
+              </p>
+            </>
+          ) : (
+            <p className="status-text">
+              Click "Load Data" to view the graphic.
+            </p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };

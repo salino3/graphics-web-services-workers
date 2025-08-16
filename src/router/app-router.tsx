@@ -1,7 +1,7 @@
 import React, { type JSX } from "react";
 import { Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { ContainerLayout } from "../layout";
-import { BarsGraphic, HomePage, PieGrafic } from "../pods";
+import { BarsGraphic, HomePage, PieGraphic } from "../pods";
 import { routesApp } from ".";
 
 interface PropsRoutes {
@@ -18,7 +18,7 @@ const routes: PropsRoutes[] = [
     path: routesApp?.bars_graphic,
     element: <BarsGraphic />,
   },
-  { path: routesApp?.pie_graphic, element: <PieGrafic /> },
+  { path: routesApp?.pie_graphic, element: <PieGraphic /> },
   {
     path: routesApp?.error404,
     element: <Navigate to={routesApp?.root} />,

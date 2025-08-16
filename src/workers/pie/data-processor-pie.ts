@@ -149,7 +149,7 @@ self.onmessage = async (event: MessageEvent) => {
             const worker1 = new Worker(
               new URL("./data-generator-pie.ts", import.meta.url)
             );
-            worker1.postMessage({ count: halfRecords, startId: 1 }); // Pasa el ID inicial
+            worker1.postMessage({ count: halfRecords, startId: 1 }); // Pass the initial ID
             worker1.onmessage = (e) => {
               console.log("Worker: Received data from worker 1.");
               resolve(e.data);
@@ -201,30 +201,28 @@ self.onmessage = async (event: MessageEvent) => {
 
       const countryMap = new Map<
         string,
-        { population: number; totalPets: number }
+        { population: number; color: string }
       >();
-      let globalTotalPets = 0;
 
       rawPersonsData.forEach((person: any) => {
         const countryName = person.country;
         if (!countryMap.has(countryName)) {
-          countryMap.set(countryName, { population: 0, totalPets: 0 });
+          countryMap.set(countryName, { population: 0, color: person.color });
         }
         const stats = countryMap.get(countryName)!;
         stats.population++;
-        stats.totalPets += person.pets;
-        globalTotalPets += person.pets;
       });
 
       const processedLabels: string[] = [];
       const processedValues: number[] = [];
+      const processedColors: string[] = [];
       const sortedCountryNames = Array.from(countryMap.keys()).sort();
 
       sortedCountryNames.forEach((countryName) => {
         const stats = countryMap.get(countryName)!;
         processedLabels.push(countryName);
-
         processedValues.push(stats.population);
+        processedColors.push(stats.color);
       });
 
       console.log(
@@ -235,6 +233,7 @@ self.onmessage = async (event: MessageEvent) => {
         type: "dataReady",
         labels: processedLabels,
         values: processedValues,
+        colors: processedColors,
         originalRecordCount: rawPersonsData.length,
       });
     } catch (error: any) {
