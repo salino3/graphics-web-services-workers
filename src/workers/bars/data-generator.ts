@@ -4,7 +4,7 @@ interface PersonData {
   country: string;
   age: number;
   work: string;
-  awi: number;
+  awi: number; // Annual Wage Income
   pets: number;
 }
 
@@ -73,7 +73,7 @@ const generatePersonsData = (
       country: randomCountryDef.name,
       age: age,
       work: work,
-      awi: awi,
+      awi: awi, // Annual Wage Income
       pets: pets,
     });
   }

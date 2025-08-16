@@ -66,7 +66,7 @@ export const BarsGraphic: React.FC = () => {
     // and assign its event handlers.
     // NOTE: The `{ type: 'module' }` option is crucial for the worker to handle `import.meta.url`
     const worker = new Worker(
-      new URL("../../workers/data-processor.ts", import.meta.url),
+      new URL("../../workers/bars/data-processor.ts", import.meta.url),
       { type: "module" }
     );
     workerRef.current = worker;
@@ -115,8 +115,8 @@ export const BarsGraphic: React.FC = () => {
       : `Percentage of Total Pets per Country (Aggregated from ${originalRecordCount} persons)`;
 
   return (
-    <div className="AppContainer">
-      <header className="App-header">
+    <div className="rootBarsGraphic">
+      <header className="AppHeader">
         <h1>Country Data Visualization with Web Workers</h1>
         <p>
           500,000 registers are generated and stored locally using IndexedDB in
