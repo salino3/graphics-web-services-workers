@@ -19,11 +19,6 @@ export const PieGraphic: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [originalRecordCount, setOriginalRecordCount] = useState<number>(0);
 
-  // State to cache processed chart data for each type
-  //   const [cachedProcessedData, setCachedProcessedData] = useState<
-  //     Partial<ProcessedChartData>
-  //   >({});
-
   const workerRef = useRef<Worker | null>(null);
 
   // Function to send a message to the worker to load and process data
@@ -120,7 +115,7 @@ export const PieGraphic: React.FC = () => {
             const total =
               chartData?.values.reduce((sum, val) => sum + val, 0) || 1;
             const percentage = ((value / total) * 100).toFixed(2);
-            return `${label}: ${value} (${percentage}%)`;
+            return ` ${label}: ${value} (${percentage}%)`;
           },
         },
       },
@@ -130,43 +125,47 @@ export const PieGraphic: React.FC = () => {
   console.log("chartData", chartData, originalRecordCount);
   return (
     <div className="rootPieGraphic">
-      <div className="rootPieGraphic">
-        <div className="button-container">
-          <button
-            onClick={loadDataWithWorker}
-            className="action-button"
-            disabled={loading}
-          >
-            {loading ? "Loading..." : "Load data"}
-          </button>
-          {chartData && (
-            <button
-              // onClick={clearData}
-              className="action-button"
-              style={{ backgroundColor: "#e67e22" }}
-            >
-              Delete data
-            </button>
-          )}
-        </div>
+      <div className="buttonContainer">
+        <button
+          onClick={loadDataWithWorker}
+          className="actionButton"
+          disabled={loading || !!chartData?.values}
+        >
+          {loading ? "Loading..." : "Load data"}
+        </button>
+        <button
+          className="clear"
+          onClick={() => {
+            setChartData(null);
+            setError(null);
+            setLoading(false);
+            // NEW: Send message to worker to clear IndexDB
+            if (workerRef.current) {
+              workerRef.current.postMessage({ type: "clearData" });
+            }
+          }}
+          disabled={loading || !chartData?.values}
+        >
+          Clear Data & IndexedDB
+        </button>
+      </div>
 
-        <div className="containerPie">
-          {loading && <p className="status-text">Loading data...</p>}
-          {error && <p className="status-text error-text">Error: {error}</p>}
-          {chartData && data ? (
-            <>
-              <div className="chart-wrapper">
-                <Pie data={data} options={options} />
-              </div>
-              <p className="status-text record-count">
-                Showing a total of{" "}
-                <span>{originalRecordCount.toLocaleString()}</span> records.
-              </p>
-            </>
-          ) : (
-            <p className="status-text">Click "Load Data" to view the graph.</p>
-          )}
-        </div>
+      <div className="containerPie">
+        {loading && <p className="status-text">Loading data...</p>}
+        {error && <p className="status-text error-text">Error: {error}</p>}
+        {chartData && data ? (
+          <>
+            <div className="chart-wrapper">
+              <Pie data={data} options={options} />
+            </div>
+            <p className="status-text record-count">
+              Showing a total of{" "}
+              <span>{originalRecordCount.toLocaleString()}</span> records.
+            </p>
+          </>
+        ) : (
+          <p className="status-text">Click "Load Data" to view the graphic.</p>
+        )}
       </div>
     </div>
   );
