@@ -21,6 +21,7 @@ export const PieGraphic: React.FC = () => {
   const [originalRecordCount, setOriginalRecordCount] = useState<number>(0);
 
   const workerRef = useRef<Worker | null>(null);
+  const loadingMessageRef = useRef<HTMLDivElement>(null);
 
   // Function to send a message to the worker to load and process data
   const loadDataWithWorker = () => {
@@ -123,7 +124,14 @@ export const PieGraphic: React.FC = () => {
     },
   };
 
-  console.log("chartData", chartData, originalRecordCount);
+  //
+  useEffect(() => {
+    if (loading && loadingMessageRef.current) {
+      // loadingMessageRef.current.setAttribute("tabIndex", "-1");
+      loadingMessageRef.current.focus();
+    }
+  }, [loading]);
+
   return (
     <div className="rootPieGraphic">
       <BtnReturnBack />
@@ -164,9 +172,14 @@ export const PieGraphic: React.FC = () => {
       <div className="containerDown">
         <div className="containerPie">
           {loading && (
-            <p className="pLoading">
+            <p
+              ref={loadingMessageRef}
+              tabIndex={-1}
+              role="status"
+              className="pLoading"
+            >
               <div></div>
-              Loading and processing data. Your UI remains responsive!{" "}
+              Loading and processing data. Your UI remains responsive!
               <div></div>
             </p>
           )}
