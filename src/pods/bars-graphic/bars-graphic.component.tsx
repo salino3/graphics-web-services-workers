@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { BtnReturnBack } from "../../common-app/btn-return-back/btn-return-back.component";
 import { BarChartDisplay } from "./components/bar-charts-display.component";
 import "./bars-graphic.styles.scss";
 
@@ -116,6 +117,7 @@ export const BarsGraphic: React.FC = () => {
 
   return (
     <div className="rootBarsGraphic">
+      <BtnReturnBack />
       <header className="AppHeader">
         <h1>Country Data Visualization with Web Workers</h1>
         <p>
