@@ -136,6 +136,7 @@ export const PieGraphic: React.FC = () => {
         </p>
         <div className="buttonContainer">
           <button
+            aria-label={loading ? "Loading..." : "Load data"}
             onClick={loadDataWithWorker}
             className="actionButton"
             disabled={loading || !!chartData?.values}
@@ -143,6 +144,7 @@ export const PieGraphic: React.FC = () => {
             {loading ? "Loading..." : "Load data"}
           </button>
           <button
+            aria-label="Clear Data & IndexedDB"
             className="clear"
             onClick={() => {
               setChartData(null);
