@@ -14,6 +14,11 @@ interface ProcessedChartData {
   originalRecordCount: number;
 }
 
+interface PropsDescribedBy {
+  text: string | undefined;
+  value: number | undefined;
+}
+
 export const PieGraphic: React.FC = () => {
   const [chartData, setChartData] = useState<ProcessedChartData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,6 +26,7 @@ export const PieGraphic: React.FC = () => {
   const [originalRecordCount, setOriginalRecordCount] = useState<number>(0);
 
   const workerRef = useRef<Worker | null>(null);
+  const loadingMessageRef = useRef<HTMLDivElement>(null);
 
   // Function to send a message to the worker to load and process data
   const loadDataWithWorker = () => {
@@ -123,7 +129,22 @@ export const PieGraphic: React.FC = () => {
     },
   };
 
-  console.log("chartData", chartData, originalRecordCount);
+  //
+  useEffect(() => {
+    if (loading && loadingMessageRef.current) {
+      // loadingMessageRef.current.setAttribute("tabIndex", "-1");
+      loadingMessageRef.current.focus();
+    }
+  }, [loading]);
+
+  const describedByArray: PropsDescribedBy[] =
+    data?.labels?.map((label, i) => ({
+      text: label,
+      value: data.datasets[0]?.data[i],
+    })) ?? [];
+
+  console.log("clog4", describedByArray);
+
   return (
     <div className="rootPieGraphic">
       <BtnReturnBack />
@@ -136,6 +157,7 @@ export const PieGraphic: React.FC = () => {
         </p>
         <div className="buttonContainer">
           <button
+            aria-label={loading ? "Loading..." : "Load data"}
             onClick={loadDataWithWorker}
             className="actionButton"
             disabled={loading || !!chartData?.values}
@@ -143,6 +165,7 @@ export const PieGraphic: React.FC = () => {
             {loading ? "Loading..." : "Load data"}
           </button>
           <button
+            aria-label="Clear Data & IndexedDB"
             className="clear"
             onClick={() => {
               setChartData(null);
@@ -162,19 +185,51 @@ export const PieGraphic: React.FC = () => {
       <div className="containerDown">
         <div className="containerPie">
           {loading && (
-            <p className="pLoading">
+            <div
+              ref={loadingMessageRef}
+              tabIndex={-1}
+              role="status"
+              className="pLoading"
+            >
               <div></div>
-              Loading and processing data. Your UI remains responsive!{" "}
+              <span>
+                Loading and processing data. Your UI remains responsive!
+              </span>
               <div></div>
-            </p>
+            </div>
           )}
           {error && <p className="status-text error-text">Error: {error}</p>}
           {chartData && data ? (
             <>
               <div className="chart-wrapper">
                 <Pie data={data} options={options} />
+                <span
+                  tabIndex={0}
+                  aria-label={`Data: ${
+                    describedByArray && describedByArray?.length > 0
+                      ? describedByArray
+                          .map(
+                            (i) => `
+                                ${i?.text}: ${i?.value} ${
+                              i?.value! === 1 ? "person" : "persons"
+                            }`
+                          )
+                          .join(", ")
+                      : ""
+                  }`}
+                >
+                  &nbsp;
+                </span>
               </div>
-              <p className="status-text record-count">
+              <p
+                aria-label={
+                  "Showing a total of " +
+                  originalRecordCount.toLocaleString() +
+                  " records."
+                }
+                tabIndex={0}
+                className="status-text record-count"
+              >
                 Showing a total of{" "}
                 <span>{originalRecordCount.toLocaleString()}</span> records.
               </p>
