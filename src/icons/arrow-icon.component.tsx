@@ -4,7 +4,7 @@ interface Props {
   fill?: string;
   stroke?: string;
   strokeWidth?: string;
-  click?: React.MouseEventHandler<SVGSVGElement> | undefined;
+  click?: React.MouseEventHandler<SVGSVGElement> | any;
   customStyles?: string;
 }
 
@@ -21,8 +21,15 @@ export const ArrowIcon: React.FC<Props> = (props) => {
 
   return (
     <svg
+      aria-label="Button go back"
+      tabIndex={0}
       className={customStyles}
       onClick={click}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          return click();
+        }
+      }}
       xmlns="http://www.w3.org/2000/svg"
       width={width}
       height={height}
