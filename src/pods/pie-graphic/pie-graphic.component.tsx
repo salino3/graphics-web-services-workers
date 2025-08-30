@@ -14,6 +14,11 @@ interface ProcessedChartData {
   originalRecordCount: number;
 }
 
+interface PropsDescribedBy {
+  text: string | undefined;
+  value: number | undefined;
+}
+
 export const PieGraphic: React.FC = () => {
   const [chartData, setChartData] = useState<ProcessedChartData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -132,6 +137,14 @@ export const PieGraphic: React.FC = () => {
     }
   }, [loading]);
 
+  const describedByArray: PropsDescribedBy[] =
+    data?.labels?.map((label, i) => ({
+      text: label,
+      value: data.datasets[0]?.data[i],
+    })) ?? [];
+
+  console.log("clog4", describedByArray);
+
   return (
     <div className="rootPieGraphic">
       <BtnReturnBack />
@@ -172,24 +185,51 @@ export const PieGraphic: React.FC = () => {
       <div className="containerDown">
         <div className="containerPie">
           {loading && (
-            <p
+            <div
               ref={loadingMessageRef}
               tabIndex={-1}
               role="status"
               className="pLoading"
             >
               <div></div>
-              Loading and processing data. Your UI remains responsive!
+              <span>
+                Loading and processing data. Your UI remains responsive!
+              </span>
               <div></div>
-            </p>
+            </div>
           )}
           {error && <p className="status-text error-text">Error: {error}</p>}
           {chartData && data ? (
             <>
               <div className="chart-wrapper">
                 <Pie data={data} options={options} />
+                <span
+                  tabIndex={0}
+                  aria-label={`Data: ${
+                    describedByArray && describedByArray?.length > 0
+                      ? describedByArray
+                          .map(
+                            (i) => `
+                                ${i?.text}: ${i?.value} ${
+                              i?.value! === 1 ? "person" : "persons"
+                            }`
+                          )
+                          .join(", ")
+                      : ""
+                  }`}
+                >
+                  &nbsp;
+                </span>
               </div>
-              <p className="status-text record-count">
+              <p
+                aria-label={
+                  "Showing a total of " +
+                  originalRecordCount.toLocaleString() +
+                  " records."
+                }
+                tabIndex={0}
+                className="status-text record-count"
+              >
                 Showing a total of{" "}
                 <span>{originalRecordCount.toLocaleString()}</span> records.
               </p>
