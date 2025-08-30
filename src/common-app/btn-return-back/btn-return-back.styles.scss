@@ -1,0 +1,16 @@
+.rootBtnReturnBack {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  width: 100%;
+  box-sizing: border-box;
+
+  .arrowStyleIcon_01 {
+    cursor: pointer;
+
+    &:active {
+      stroke: #61dafb;
+    }
+  }
+}

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 import { Pie } from "react-chartjs-2";
+import { BtnReturnBack } from "../../common-app/btn-return-back/btn-return-back.component";
 import "./pie-graphic.styles.scss";
 
 // Register the required components from Chart.js
@@ -125,6 +126,7 @@ export const PieGraphic: React.FC = () => {
   console.log("chartData", chartData, originalRecordCount);
   return (
     <div className="rootPieGraphic">
+      <BtnReturnBack />
       <div className="containerUp">
         <h1>Country Data Visualization with Web Workers</h1>
         <p>
