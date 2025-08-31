@@ -15,6 +15,9 @@ interface ProcessedChartData {
 }
 
 export const BarsGraphic: React.FC = () => {
+  const workerRef = useRef<Worker | null>(null);
+  const loadingMessageRef = useRef<HTMLDivElement>(null);
+
   const [chartData, setChartData] = useState<ProcessedChartData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -26,8 +29,6 @@ export const BarsGraphic: React.FC = () => {
   const [cachedProcessedData, setCachedProcessedData] = useState<
     Partial<Record<ChartDataType, ProcessedChartData>>
   >({});
-
-  const workerRef = useRef<Worker | null>(null);
 
   // Function to send a message to the worker to load and process data
   const loadDataWithWorker = (dataType: ChartDataType) => {
@@ -108,6 +109,13 @@ export const BarsGraphic: React.FC = () => {
     };
   }, []);
 
+  //
+  useEffect(() => {
+    if (loading && loadingMessageRef.current) {
+      loadingMessageRef.current.focus();
+    }
+  }, [loading]);
+
   const chartTitle =
     currentChartDataType === "population"
       ? `Total Population per Country (Aggregated from ${originalRecordCount.toLocaleString()} persons)`
@@ -181,7 +189,12 @@ export const BarsGraphic: React.FC = () => {
       <main className="AppMain">
         {error && <p className="error-message">Error: {error}</p>}
         {loading && currentChartDataType && (
-          <p className="pLoading">
+          <p
+            ref={loadingMessageRef}
+            tabIndex={-1}
+            role="status"
+            className="pLoading"
+          >
             <div></div>
             Loading and processing data. Your UI remains responsive! <div></div>
           </p>
