@@ -14,11 +14,6 @@ interface ProcessedChartData {
   dataType: ChartDataType;
 }
 
-interface PropsDescribedBy {
-  text: string | undefined;
-  value: number | undefined;
-}
-
 export const BarsGraphic: React.FC = () => {
   const workerRef = useRef<Worker | null>(null);
   const loadingMessageRef = useRef<HTMLDivElement>(null);
@@ -121,13 +116,6 @@ export const BarsGraphic: React.FC = () => {
     }
   }, [loading]);
 
-  //
-  const describedByArray: PropsDescribedBy[] =
-    chartData?.labels?.map((label, i) => ({
-      text: label,
-      value: chartData.values[i],
-    })) ?? [];
-
   const chartTitle =
     currentChartDataType === "population"
       ? `Total Population per Country (Aggregated from ${originalRecordCount.toLocaleString()} persons)`
@@ -227,31 +215,12 @@ export const BarsGraphic: React.FC = () => {
         )}
 
         {chartData && currentChartDataType && (
-          <>
-            <span
-              tabIndex={0}
-              aria-label={`Data: ${
-                describedByArray && describedByArray?.length > 0
-                  ? describedByArray
-                      .map(
-                        (i) => `
-                                ${i?.text}: ${i?.value} ${
-                          i?.value! === 1 ? "person" : "persons"
-                        }`
-                      )
-                      .join(", ")
-                  : ""
-              }`}
-            >
-              &nbsp;
-            </span>
-            <BarChartDisplay
-              labels={chartData.labels}
-              values={chartData.values}
-              title={chartTitle}
-              dataType={currentChartDataType}
-            />
-          </>
+          <BarChartDisplay
+            labels={chartData.labels}
+            values={chartData.values}
+            title={chartTitle}
+            dataType={currentChartDataType}
+          />
         )}
         {!loading && !chartData && !error && (
           <p

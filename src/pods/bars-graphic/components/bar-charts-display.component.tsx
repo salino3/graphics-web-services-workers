@@ -24,7 +24,12 @@ interface BarChartDisplayProps {
   labels: string[];
   values: number[];
   title: string;
-  dataType: "population" | "pets" | "petsPercentage"; // Updated prop type
+  dataType: "population" | "pets" | "petsPercentage";
+}
+
+interface PropsDescribedBy {
+  text: string | undefined;
+  value: number | undefined;
 }
 
 export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
@@ -130,12 +135,60 @@ export const BarChartDisplay: React.FC<BarChartDisplayProps> = ({
     },
   };
 
+  //
+  const describedByArray: PropsDescribedBy[] =
+    labels?.map((label, i) => ({
+      text: label,
+      value: values[i],
+    })) ?? [];
+
   return (
     <div
       className="centerRow"
-      style={{ maxHeight: "400px", width: "100%", margin: "auto" }}
+      style={{
+        maxHeight: "400px",
+        width: "100%",
+        margin: "auto",
+        position: "relative",
+      }}
     >
       <Bar data={data} options={options} />
+      <div
+        tabIndex={0}
+        style={{ position: "absolute" }}
+        aria-label={datasetLabel}
+      >
+        &nbsp;
+      </div>
+      <div
+        tabIndex={0}
+        style={{ position: "absolute" }}
+        aria-label={yAxisTitle}
+      >
+        &nbsp;
+      </div>
+      <span
+        tabIndex={0}
+        style={{ position: "absolute" }}
+        aria-label={`Data: ${
+          describedByArray && describedByArray?.length > 0
+            ? describedByArray
+                .map(
+                  (i) => `
+                                ${i?.text}: ${i?.value}${
+                    dataType === "petsPercentage"
+                      ? "%"
+                      : i?.value! === 1
+                      ? " person"
+                      : " persons"
+                  }`
+                )
+                .join(", ")
+            : ""
+        }`}
+      >
+        &nbsp;
+      </span>
     </div>
   );
 };
