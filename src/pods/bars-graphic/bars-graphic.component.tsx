@@ -135,6 +135,7 @@ export const BarsGraphic: React.FC = () => {
         </p>
 
         <button
+          aria-label="Clear Data & IndexedDB"
           className="clear"
           onClick={() => {
             setChartData(null);
@@ -165,6 +166,11 @@ export const BarsGraphic: React.FC = () => {
           </button> */}
           {/* Pets button */}
           <button
+            aria-label={
+              loading && currentChartDataType === "pets"
+                ? "Processing Pets..."
+                : "Show Pets Chart"
+            }
             className="button"
             onClick={() => loadDataWithWorker("pets")}
             disabled={loading || currentChartDataType === "pets"}
@@ -175,6 +181,11 @@ export const BarsGraphic: React.FC = () => {
           </button>
           {/* Pets Percentage button */}
           <button
+            aria-label={
+              loading && currentChartDataType === "petsPercentage"
+                ? "Processing Pet %..."
+                : "Show Pet Percentage Chart"
+            }
             className="button"
             onClick={() => loadDataWithWorker("petsPercentage")}
             disabled={loading || currentChartDataType === "petsPercentage"}
