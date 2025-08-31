@@ -20,13 +20,13 @@ interface PropsDescribedBy {
 }
 
 export const PieGraphic: React.FC = () => {
+  const workerRef = useRef<Worker | null>(null);
+  const loadingMessageRef = useRef<HTMLDivElement>(null);
+
   const [chartData, setChartData] = useState<ProcessedChartData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [originalRecordCount, setOriginalRecordCount] = useState<number>(0);
-
-  const workerRef = useRef<Worker | null>(null);
-  const loadingMessageRef = useRef<HTMLDivElement>(null);
 
   // Function to send a message to the worker to load and process data
   const loadDataWithWorker = () => {
@@ -142,8 +142,6 @@ export const PieGraphic: React.FC = () => {
       text: label,
       value: data.datasets[0]?.data[i],
     })) ?? [];
-
-  console.log("clog4", describedByArray);
 
   return (
     <div className="rootPieGraphic">
